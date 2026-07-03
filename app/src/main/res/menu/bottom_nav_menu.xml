@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/homeFragment"
+        android:icon="@drawable/ic_home"
+        android:title="@string/nav_home" />
+    <item
+        android:id="@+id/createPostFragment"
+        android:icon="@drawable/ic_add"
+        android:title="@string/nav_create" />
+    <item
+        android:id="@+id/recipesFragment"
+        android:icon="@drawable/ic_recipes"
+        android:title="@string/nav_recipes" />
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@drawable/ic_profile"
+        android:title="@string/nav_profile" />
+</menu>

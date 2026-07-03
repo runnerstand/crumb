@@ -7,4 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="crumb_primary">#386A20</color>
+    <color name="crumb_primary_dark">#1F4D0C</color>
+    <color name="crumb_secondary">#6B5E1F</color>
 </resources>
