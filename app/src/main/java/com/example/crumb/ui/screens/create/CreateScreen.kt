@@ -397,14 +397,6 @@ fun CreateContent(
                     )
                 }
             }
-
-            Text(
-                text = "Posts are created as Local User until authentication is added.",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-            )
         }
     }
 }

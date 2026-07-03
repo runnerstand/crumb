@@ -47,12 +47,6 @@ fun ProfileContent(
             text = "Profile",
             style = MaterialTheme.typography.headlineMedium
         )
-        Text(
-            text = "Show temporary local user details and preferences here later.",
-            modifier = Modifier.padding(top = 8.dp),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge
-        )
         BackendStatus(
             healthUiState = healthUiState,
             onRetryClick = onRetryClick

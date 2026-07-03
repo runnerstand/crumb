@@ -27,12 +27,6 @@ fun RecipesScreen() {
             text = "Recipes",
             style = MaterialTheme.typography.headlineMedium
         )
-        Text(
-            text = "Browse saved and suggested recipes once recipe data is connected.",
-            modifier = Modifier.padding(top = 8.dp),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.bodyLarge
-        )
     }
 }
 
