@@ -13,8 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.crumb.ui.theme.CrumbTheme
 
 @Composable
 fun ProfileScreen(
@@ -22,8 +24,20 @@ fun ProfileScreen(
 ) {
     val healthUiState by viewModel.healthUiState.collectAsState()
 
+    ProfileContent(
+        healthUiState = healthUiState,
+        onRetryClick = viewModel::checkBackendHealth
+    )
+}
+
+@Composable
+fun ProfileContent(
+    healthUiState: HealthUiState,
+    onRetryClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -41,7 +55,7 @@ fun ProfileScreen(
         )
         BackendStatus(
             healthUiState = healthUiState,
-            onRetryClick = viewModel::checkBackendHealth
+            onRetryClick = onRetryClick
         )
     }
 }
@@ -91,5 +105,38 @@ private fun BackendStatus(
                 Text(text = "Retry")
             }
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreviewSuccessLight() {
+    CrumbTheme(darkTheme = false) {
+        ProfileContent(
+            healthUiState = HealthUiState.Success("Healthy"),
+            onRetryClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreviewSuccessDark() {
+    CrumbTheme(darkTheme = true) {
+        ProfileContent(
+            healthUiState = HealthUiState.Success("Healthy"),
+            onRetryClick = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ProfileScreenPreviewErrorLight() {
+    CrumbTheme(darkTheme = false) {
+        ProfileContent(
+            healthUiState = HealthUiState.Error("Could not reach backend server on http://10.0.2.2:8000"),
+            onRetryClick = {}
+        )
     }
 }

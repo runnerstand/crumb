@@ -37,6 +37,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.tooling.preview.Preview
+import com.example.crumb.ui.theme.CrumbTheme
 
 @Composable
 fun HomeScreen(
@@ -63,39 +65,57 @@ fun HomeScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-        ) {
-            Text(
-                text = "Community",
-                style = MaterialTheme.typography.headlineMedium
+        HomeContent(
+            uiState = uiState,
+            onOpenComments = onOpenComments,
+            onRetryClick = viewModel::loadPosts,
+            onUpdatePost = viewModel::updatePost,
+            onDeletePost = viewModel::deletePost,
+            modifier = Modifier.padding(innerPadding)
+        )
+    }
+}
+
+@Composable
+fun HomeContent(
+    uiState: CommunityPostUiState,
+    onOpenComments: (Int) -> Unit,
+    onRetryClick: () -> Unit,
+    onUpdatePost: (Int, String, List<String>, String) -> Unit,
+    onDeletePost: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+    ) {
+        Text(
+            text = "Community",
+            style = MaterialTheme.typography.headlineMedium
+        )
+
+        when (val state = uiState) {
+            CommunityPostUiState.Loading -> LoadingContent()
+            CommunityPostUiState.Empty -> EmptyContent(onRetryClick = onRetryClick)
+            is CommunityPostUiState.Error -> ErrorContent(
+                message = state.message,
+                onRetryClick = onRetryClick
             )
 
-            when (val state = uiState) {
-                CommunityPostUiState.Loading -> LoadingContent()
-                CommunityPostUiState.Empty -> EmptyContent(onRetryClick = viewModel::loadPosts)
-                is CommunityPostUiState.Error -> ErrorContent(
-                    message = state.message,
-                    onRetryClick = viewModel::loadPosts
-                )
-
-                is CommunityPostUiState.Success -> LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 12.dp)
-                ) {
-                    items(state.posts, key = { it.id }) { post ->
-                        CommunityPostCard(
-                            post = post,
-                            onOpenComments = { onOpenComments(post.id) },
-                            onUpdatePost = viewModel::updatePost,
-                            onDeletePost = viewModel::deletePost,
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-                    }
+            is CommunityPostUiState.Success -> LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = 12.dp)
+            ) {
+                items(state.posts, key = { it.id }) { post ->
+                    CommunityPostCard(
+                        post = post,
+                        onOpenComments = { onOpenComments(post.id) },
+                        onUpdatePost = onUpdatePost,
+                        onDeletePost = onDeletePost,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
                 }
             }
         }
@@ -304,6 +324,73 @@ private fun CommunityPostCard(
                     Text("Cancel")
                 }
             }
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeContentPreviewLight() {
+    CrumbTheme(darkTheme = false) {
+        HomeContent(
+            uiState = CommunityPostUiState.Success(
+                posts = listOf(
+                    CommunityPostUiModel(
+                        id = 1,
+                        creatorId = "1",
+                        creatorName = "Chef Alice",
+                        title = "Spaghetti Bolognese",
+                        ingredients = listOf("Pasta", "Tomato", "Minced Beef", "Garlic"),
+                        caption = "An Italian classic made with love.",
+                        createdAt = "2026-07-03",
+                        updatedAt = "2026-07-03",
+                        isOwnedByLocalUser = true
+                    ),
+                    CommunityPostUiModel(
+                        id = 2,
+                        creatorId = "2",
+                        creatorName = "Baker Bob",
+                        title = "Sourdough Bread",
+                        ingredients = listOf("Flour", "Water", "Salt", "Sourdough Starter"),
+                        caption = "Crispy crust and chewy crumb.",
+                        createdAt = "2026-07-02",
+                        updatedAt = "2026-07-02",
+                        isOwnedByLocalUser = false
+                    )
+                )
+            ),
+            onOpenComments = {},
+            onRetryClick = {},
+            onUpdatePost = { _, _, _, _ -> },
+            onDeletePost = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun HomeContentPreviewDark() {
+    CrumbTheme(darkTheme = true) {
+        HomeContent(
+            uiState = CommunityPostUiState.Success(
+                posts = listOf(
+                    CommunityPostUiModel(
+                        id = 1,
+                        creatorId = "1",
+                        creatorName = "Chef Alice",
+                        title = "Spaghetti Bolognese",
+                        ingredients = listOf("Pasta", "Tomato", "Minced Beef", "Garlic"),
+                        caption = "An Italian classic made with love.",
+                        createdAt = "2026-07-03",
+                        updatedAt = "2026-07-03",
+                        isOwnedByLocalUser = true
+                    )
+                )
+            ),
+            onOpenComments = {},
+            onRetryClick = {},
+            onUpdatePost = { _, _, _, _ -> },
+            onDeletePost = {}
         )
     }
 }

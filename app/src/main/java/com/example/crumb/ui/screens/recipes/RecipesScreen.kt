@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.crumb.ui.theme.CrumbTheme
 
 @Composable
 fun RecipesScreen() {
@@ -31,5 +33,21 @@ fun RecipesScreen() {
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.bodyLarge
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RecipesScreenPreviewLight() {
+    CrumbTheme(darkTheme = false) {
+        RecipesScreen()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun RecipesScreenPreviewDark() {
+    CrumbTheme(darkTheme = true) {
+        RecipesScreen()
     }
 }
