@@ -1,4 +1,4 @@
-package com.example.crumb.ui.screens.home
+package com.example.crumb.ui.screens.comments
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +16,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -36,23 +35,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
-fun HomeScreen(
-    refreshSignal: Long,
-    onOpenComments: (Int) -> Unit,
-    viewModel: HomeViewModel = viewModel()
+fun CommentsScreen(
+    postId: Int,
+    onBackClick: () -> Unit,
+    viewModel: CommentsViewModel = viewModel(
+        key = "comments-$postId",
+        factory = CommentsViewModelFactory(postId)
+    )
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val operationMessage by viewModel.operationMessage.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(refreshSignal) {
-        if (refreshSignal != 0L) {
-            viewModel.loadPosts()
-        }
-    }
+    var newCommentText by remember { mutableStateOf("") }
 
     LaunchedEffect(operationMessage) {
         val message = operationMessage ?: return@LaunchedEffect
@@ -69,31 +68,59 @@ fun HomeScreen(
                 .padding(innerPadding)
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            Text(
-                text = "Community",
-                style = MaterialTheme.typography.headlineMedium
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                TextButton(onClick = onBackClick) {
+                    Text("Back")
+                }
+                Text(
+                    text = "Comments",
+                    modifier = Modifier.padding(start = 8.dp),
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
+
+            OutlinedTextField(
+                value = newCommentText,
+                onValueChange = { newCommentText = it },
+                label = { Text("Add a comment") },
+                supportingText = { Text("${newCommentText.length}/500") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                minLines = 2,
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
             )
+            Button(
+                onClick = {
+                    viewModel.createComment(newCommentText)
+                    newCommentText = ""
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            ) {
+                Text("Post Comment")
+            }
 
             when (val state = uiState) {
-                CommunityPostUiState.Loading -> LoadingContent()
-                CommunityPostUiState.Empty -> EmptyContent(onRetryClick = viewModel::loadPosts)
-                is CommunityPostUiState.Error -> ErrorContent(
+                CommunityCommentUiState.Loading -> LoadingComments()
+                CommunityCommentUiState.Empty -> EmptyComments(onRetryClick = viewModel::loadComments)
+                is CommunityCommentUiState.Error -> CommentError(
                     message = state.message,
-                    onRetryClick = viewModel::loadPosts
+                    onRetryClick = viewModel::loadComments
                 )
 
-                is CommunityPostUiState.Success -> LazyColumn(
+                is CommunityCommentUiState.Success -> LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 12.dp)
                 ) {
-                    items(state.posts, key = { it.id }) { post ->
-                        CommunityPostCard(
-                            post = post,
-                            onOpenComments = { onOpenComments(post.id) },
-                            onUpdatePost = viewModel::updatePost,
-                            onDeletePost = viewModel::deletePost,
-                            modifier = Modifier.padding(bottom = 12.dp)
+                    items(state.comments, key = { it.id }) { comment ->
+                        CommentCard(
+                            comment = comment,
+                            onUpdateComment = viewModel::updateComment,
+                            onDeleteComment = viewModel::deleteComment,
+                            modifier = Modifier.padding(bottom = 10.dp)
                         )
                     }
                 }
@@ -102,8 +129,17 @@ fun HomeScreen(
     }
 }
 
+private class CommentsViewModelFactory(
+    private val postId: Int
+) : ViewModelProvider.Factory {
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        return CommentsViewModel(postId = postId) as T
+    }
+}
+
 @Composable
-private fun LoadingContent() {
+private fun LoadingComments() {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -113,17 +149,14 @@ private fun LoadingContent() {
 }
 
 @Composable
-private fun EmptyContent(onRetryClick: () -> Unit) {
+private fun EmptyComments(onRetryClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 32.dp),
+            .padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "No community posts yet.",
-            style = MaterialTheme.typography.bodyLarge
-        )
+        Text("No comments yet.", style = MaterialTheme.typography.bodyLarge)
         Button(
             onClick = onRetryClick,
             modifier = Modifier.padding(top = 12.dp)
@@ -134,14 +167,14 @@ private fun EmptyContent(onRetryClick: () -> Unit) {
 }
 
 @Composable
-private fun ErrorContent(
+private fun CommentError(
     message: String,
     onRetryClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 32.dp),
+            .padding(top = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -159,52 +192,29 @@ private fun ErrorContent(
 }
 
 @Composable
-private fun CommunityPostCard(
-    post: CommunityPostUiModel,
-    onOpenComments: () -> Unit,
-    onUpdatePost: (Int, String, List<String>, String) -> Unit,
-    onDeletePost: (Int) -> Unit,
+private fun CommentCard(
+    comment: CommunityCommentUiModel,
+    onUpdateComment: (Int, String) -> Unit,
+    onDeleteComment: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var isEditing by remember(post.id) { mutableStateOf(false) }
-    var title by remember(post.id) { mutableStateOf(post.title) }
-    var ingredients by remember(post.id) { mutableStateOf(post.ingredients.joinToString(", ")) }
-    var caption by remember(post.id) { mutableStateOf(post.caption) }
-    var validationMessage by remember(post.id) { mutableStateOf<String?>(null) }
-    var showDeleteDialog by remember(post.id) { mutableStateOf(false) }
+    var isEditing by remember(comment.id) { mutableStateOf(false) }
+    var commentText by remember(comment.id) { mutableStateOf(comment.commentText) }
+    var validationMessage by remember(comment.id) { mutableStateOf<String?>(null) }
+    var showDeleteDialog by remember(comment.id) { mutableStateOf(false) }
 
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(14.dp)) {
             if (isEditing) {
                 OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Title") },
+                    value = commentText,
+                    onValueChange = { commentText = it },
+                    label = { Text("Comment") },
+                    supportingText = { Text("${commentText.length}/500") },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
-                )
-                OutlinedTextField(
-                    value = ingredients,
-                    onValueChange = { ingredients = it },
-                    label = { Text("Ingredients") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    minLines = 2,
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words)
-                )
-                OutlinedTextField(
-                    value = caption,
-                    onValueChange = { caption = it },
-                    label = { Text("Caption") },
-                    supportingText = { Text("${caption.length}/200") },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
                     minLines = 2,
                     keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences)
                 )
@@ -216,21 +226,16 @@ private fun CommunityPostCard(
                         style = MaterialTheme.typography.bodySmall
                     )
                 }
-                Row(modifier = Modifier.padding(top = 12.dp)) {
+                Row(modifier = Modifier.padding(top = 10.dp)) {
                     Button(
                         onClick = {
-                            val cleanedIngredients = ingredients
-                                .split(",")
-                                .map { it.trim() }
-                                .filter { it.isNotBlank() }
                             validationMessage = when {
-                                title.trim().isBlank() -> "Title is required."
-                                cleanedIngredients.isEmpty() -> "Add at least one ingredient."
-                                caption.trim().length > 200 -> "Caption must be 200 characters or fewer."
+                                commentText.trim().isBlank() -> "Comment is required."
+                                commentText.trim().length > 500 -> "Comment must be 500 characters or fewer."
                                 else -> null
                             }
                             if (validationMessage == null) {
-                                onUpdatePost(post.id, title, cleanedIngredients, caption)
+                                onUpdateComment(comment.id, commentText)
                                 isEditing = false
                             }
                         }
@@ -243,35 +248,22 @@ private fun CommunityPostCard(
                     }
                 }
             } else {
-                Text(text = post.title, style = MaterialTheme.typography.titleLarge)
                 Text(
-                    text = "By ${post.creatorName}",
-                    modifier = Modifier.padding(top = 4.dp),
+                    text = comment.creatorName,
+                    style = MaterialTheme.typography.titleSmall
+                )
+                Text(
+                    text = comment.commentText,
+                    modifier = Modifier.padding(top = 6.dp),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = "Created ${comment.createdAt} | Updated ${comment.updatedAt}",
+                    modifier = Modifier.padding(top = 8.dp),
                     style = MaterialTheme.typography.bodySmall
                 )
-                Text(
-                    text = "Ingredients: ${post.ingredients.joinToString(", ")}",
-                    modifier = Modifier.padding(top = 10.dp),
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                if (post.caption.isNotBlank()) {
-                    Text(
-                        text = post.caption,
-                        modifier = Modifier.padding(top = 8.dp),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-                Text(
-                    text = "Created ${post.createdAt} | Updated ${post.updatedAt}",
-                    modifier = Modifier.padding(top = 10.dp),
-                    style = MaterialTheme.typography.bodySmall
-                )
-                HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                Row {
-                    TextButton(onClick = onOpenComments) {
-                        Text("Comments")
-                    }
-                    if (post.isOwnedByLocalUser) {
+                if (comment.isOwnedByLocalUser) {
+                    Row(modifier = Modifier.padding(top = 8.dp)) {
                         TextButton(onClick = { isEditing = true }) {
                             Text("Edit")
                         }
@@ -287,13 +279,13 @@ private fun CommunityPostCard(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text("Delete post?") },
-            text = { Text("This will also remove its comments.") },
+            title = { Text("Delete comment?") },
+            text = { Text("This comment will be removed from the post.") },
             confirmButton = {
                 TextButton(
                     onClick = {
                         showDeleteDialog = false
-                        onDeletePost(post.id)
+                        onDeleteComment(comment.id)
                     }
                 ) {
                     Text("Delete")

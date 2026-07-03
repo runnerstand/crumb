@@ -16,6 +16,9 @@ sealed class CrumbDestination(
     data object Create : CrumbDestination("create", "Create", Icons.Filled.AddCircle)
     data object Recipes : CrumbDestination("recipes", "Recipes", Icons.Filled.Restaurant)
     data object Profile : CrumbDestination("profile", "Profile", Icons.Filled.Person)
+    data object Comments : CrumbDestination("comments/{postId}", "Comments", Icons.Filled.Home) {
+        fun createRoute(postId: Int): String = "comments/$postId"
+    }
 }
 
 val bottomNavDestinations = listOf(
