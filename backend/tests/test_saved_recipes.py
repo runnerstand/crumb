@@ -56,12 +56,35 @@ def saved_recipe_payload() -> dict[str, object]:
     }
 
 
+def user_recipe_payload() -> dict[str, object]:
+    return {
+        "title": "Tomato Egg Rice Recipe",
+        "ingredients": [
+            {"ingredient_name": "egg", "quantity": "2", "unit": ""},
+            {"ingredient_name": "tomato", "quantity": "1", "unit": ""},
+            {"ingredient_name": "rice", "quantity": "1", "unit": "cup"},
+        ],
+        "instructions": ["Cook rice.", "Add tomato and egg."],
+        "cooking_time_minutes": 20,
+    }
+
+
+def create_user_recipe(client: TestClient) -> dict:
+    response = client.post("/recipes/user-created", json=user_recipe_payload())
+
+    assert response.status_code == 201
+
+    return response.json()
+
+
 def test_create_saved_recipe(client: TestClient) -> None:
     response = client.post("/recipes/saved", json=saved_recipe_payload())
 
     assert response.status_code == 201
     body = response.json()
     assert body["id"] == 1
+    assert body["user_id"] == "local-user"
+    assert body["recipe_id"] is None
     assert body["title"] == "Tomato Egg Rice"
     assert body["ingredients"] == ["egg", "tomato", "rice", "cooking oil"]
     assert body["missing_ingredients"] == ["cooking oil"]
@@ -72,6 +95,61 @@ def test_create_saved_recipe(client: TestClient) -> None:
     ]
     assert body["cooking_time_minutes"] == 20
     assert "created_at" in body
+
+
+def test_create_saved_recipe_can_link_user_recipe(client: TestClient) -> None:
+    recipe = create_user_recipe(client)
+    payload = saved_recipe_payload()
+    payload["recipe_id"] = recipe["id"]
+
+    response = client.post("/recipes/saved", json=payload)
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["user_id"] == "local-user"
+    assert body["recipe_id"] == recipe["id"]
+
+
+def test_create_saved_recipe_rejects_duplicate_recipe_link(
+    client: TestClient,
+) -> None:
+    recipe = create_user_recipe(client)
+    payload = saved_recipe_payload()
+    payload["recipe_id"] = recipe["id"]
+    first_response = client.post("/recipes/saved", json=payload)
+    assert first_response.status_code == 201
+
+    second_response = client.post("/recipes/saved", json=payload)
+
+    assert second_response.status_code == 409
+    assert second_response.json() == {"detail": "Recipe already saved."}
+
+
+def test_create_saved_recipe_rejects_missing_recipe_link(client: TestClient) -> None:
+    payload = saved_recipe_payload()
+    payload["recipe_id"] = 999
+
+    response = client.post("/recipes/saved", json=payload)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Recipe not found."}
+
+
+def test_saved_recipe_snapshot_survives_source_recipe_delete(client: TestClient) -> None:
+    recipe = create_user_recipe(client)
+    payload = saved_recipe_payload()
+    payload["recipe_id"] = recipe["id"]
+    save_response = client.post("/recipes/saved", json=payload)
+    assert save_response.status_code == 201
+
+    delete_recipe_response = client.delete(f"/recipes/user-created/{recipe['id']}")
+    list_response = client.get("/recipes/saved")
+
+    assert delete_recipe_response.status_code == 200
+    assert list_response.status_code == 200
+    saved_recipe = list_response.json()[0]
+    assert saved_recipe["title"] == "Tomato Egg Rice"
+    assert saved_recipe["recipe_id"] is None
 
 
 def test_list_saved_recipes(client: TestClient) -> None:

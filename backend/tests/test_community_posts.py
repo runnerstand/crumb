@@ -50,6 +50,27 @@ def community_post_payload() -> dict[str, object]:
     }
 
 
+def recipe_payload() -> dict[str, object]:
+    return {
+        "title": "Tomato Egg Rice Recipe",
+        "ingredients": [
+            {"ingredient_name": "egg", "quantity": "2", "unit": ""},
+            {"ingredient_name": "tomato", "quantity": "1", "unit": ""},
+            {"ingredient_name": "rice", "quantity": "1", "unit": "cup"},
+        ],
+        "instructions": ["Cook rice.", "Add tomato and egg."],
+        "cooking_time_minutes": 20,
+    }
+
+
+def create_recipe(client: TestClient) -> dict:
+    response = client.post("/recipes/user-created", json=recipe_payload())
+
+    assert response.status_code == 201
+
+    return response.json()
+
+
 def create_community_post(client: TestClient) -> dict:
     response = client.post("/community/posts", json=community_post_payload())
 
@@ -78,12 +99,35 @@ def test_create_community_post_uses_local_identity_and_catalogue_ingredients(
     body = response.json()
     assert body["id"] == 1
     assert body["creator_id"] == "local-user"
+    assert body["recipe_id"] is None
     assert body["creator_name"] == "Local User"
     assert body["title"] == "Tomato Egg Rice"
     assert body["ingredients_json"] == ["egg", "tomato", "rice"]
     assert body["caption"] == "Simple pantry dinner."
     assert "created_at" in body
     assert "updated_at" in body
+
+
+def test_create_community_post_can_link_user_recipe(client: TestClient) -> None:
+    recipe = create_recipe(client)
+    payload = community_post_payload()
+    payload["recipe_id"] = recipe["id"]
+
+    response = client.post("/community/posts", json=payload)
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["recipe_id"] == recipe["id"]
+
+
+def test_create_community_post_rejects_missing_recipe_link(client: TestClient) -> None:
+    payload = community_post_payload()
+    payload["recipe_id"] = 999
+
+    response = client.post("/community/posts", json=payload)
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Recipe not found."}
 
 
 def test_create_community_post_rejects_blank_title(client: TestClient) -> None:
@@ -165,6 +209,39 @@ def test_update_community_post_with_local_creator(client: TestClient) -> None:
     assert body["updated_at"] != post["updated_at"]
 
 
+def test_update_community_post_can_change_and_remove_recipe_link(
+    client: TestClient,
+) -> None:
+    first_recipe = create_recipe(client)
+    second_payload = recipe_payload()
+    second_payload["title"] = "Garlic Spinach Recipe"
+    second_payload["ingredients"] = [
+        {"ingredient_name": "spinach", "quantity": "2", "unit": "cups"},
+        {"ingredient_name": "garlic", "quantity": "2", "unit": "cloves"},
+    ]
+    second_response = client.post("/recipes/user-created", json=second_payload)
+    assert second_response.status_code == 201
+    second_recipe = second_response.json()
+
+    payload = community_post_payload()
+    payload["recipe_id"] = first_recipe["id"]
+    post_response = client.post("/community/posts", json=payload)
+    assert post_response.status_code == 201
+    post = post_response.json()
+
+    payload["recipe_id"] = second_recipe["id"]
+    update_response = client.patch(f"/community/posts/{post['id']}", json=payload)
+
+    assert update_response.status_code == 200
+    assert update_response.json()["recipe_id"] == second_recipe["id"]
+
+    payload["recipe_id"] = None
+    remove_response = client.patch(f"/community/posts/{post['id']}", json=payload)
+
+    assert remove_response.status_code == 200
+    assert remove_response.json()["recipe_id"] is None
+
+
 def test_update_community_post_rejects_invalid_payload(client: TestClient) -> None:
     post = create_community_post(client)
     payload = community_post_payload()
@@ -210,6 +287,22 @@ def test_delete_community_post_with_local_creator(client: TestClient) -> None:
     assert delete_response.status_code == 200
     assert delete_response.json() == {"message": "Community post deleted."}
     assert list_response.json() == []
+
+
+def test_delete_community_post_does_not_delete_linked_recipe(client: TestClient) -> None:
+    recipe = create_recipe(client)
+    payload = community_post_payload()
+    payload["recipe_id"] = recipe["id"]
+    post_response = client.post("/community/posts", json=payload)
+    assert post_response.status_code == 201
+    post = post_response.json()
+
+    delete_response = client.delete(f"/community/posts/{post['id']}")
+    recipe_response = client.get(f"/recipes/user-created/{recipe['id']}")
+
+    assert delete_response.status_code == 200
+    assert recipe_response.status_code == 200
+    assert recipe_response.json()["id"] == recipe["id"]
 
 
 def test_delete_community_post_rejects_different_creator(

@@ -46,6 +46,8 @@ class RecipesFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recipeAdapter = RecipeAdapter(
             onViewRecipe = ::showRecipeDetails,
+            onSaveRecipe = viewModel::saveRecipe,
+            onUnsaveRecipe = viewModel::unsaveRecipe,
             onEditRecipe = ::showEditRecipeDialog,
             onDeleteRecipe = ::confirmDeleteRecipe
         )

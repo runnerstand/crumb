@@ -58,6 +58,22 @@
                 android:textColor="#4E3C2B" />
 
             <TextView
+                android:id="@+id/linkedRecipeTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="#EEF6E8"
+                android:clickable="true"
+                android:focusable="true"
+                android:lineSpacingExtra="2dp"
+                android:paddingStart="12dp"
+                android:paddingTop="10dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="10dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#315B22" />
+
+            <TextView
                 android:id="@+id/postCaptionTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -183,6 +199,27 @@
                     android:gravity="top"
                     android:inputType="textCapSentences|textMultiLine"
                     android:minLines="2" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/editRecipeInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:hint="Linked recipe"
+                app:boxCornerRadiusBottomEnd="14dp"
+                app:boxCornerRadiusBottomStart="14dp"
+                app:boxCornerRadiusTopEnd="14dp"
+                app:boxCornerRadiusTopStart="14dp"
+                app:boxStrokeColor="#8AAE6C"
+                app:hintTextColor="#386A20">
+
+                <AutoCompleteTextView
+                    android:id="@+id/editRecipeAutoCompleteTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="none" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView

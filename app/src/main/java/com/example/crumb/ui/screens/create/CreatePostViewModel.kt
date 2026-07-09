@@ -2,8 +2,10 @@ package com.example.crumb.ui.screens.create
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.crumb.core.config.AppConfig
 import com.example.crumb.data.repository.CommunityPostRepository
 import com.example.crumb.data.repository.IngredientRepository
+import com.example.crumb.data.repository.RecipeRepository
 import com.example.crumb.ui.screens.home.toOperationMessage
 import java.io.IOException
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +16,8 @@ import retrofit2.HttpException
 
 class CreatePostViewModel(
     private val repository: CommunityPostRepository = CommunityPostRepository(),
-    private val ingredientRepository: IngredientRepository = IngredientRepository()
+    private val ingredientRepository: IngredientRepository = IngredientRepository(),
+    private val recipeRepository: RecipeRepository = RecipeRepository()
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<CreatePostUiState>(CreatePostUiState.Idle)
     val uiState: StateFlow<CreatePostUiState> = _uiState.asStateFlow()
@@ -24,11 +27,20 @@ class CreatePostViewModel(
     )
     val catalogueState: StateFlow<IngredientCatalogueUiState> = _catalogueState.asStateFlow()
 
+    private val _recipePickerState = MutableStateFlow<PostRecipePickerUiState>(
+        PostRecipePickerUiState.Loading
+    )
+    val recipePickerState: StateFlow<PostRecipePickerUiState> = _recipePickerState.asStateFlow()
+
     private val _selectedIngredients = MutableStateFlow<List<String>>(emptyList())
     val selectedIngredients: StateFlow<List<String>> = _selectedIngredients.asStateFlow()
 
+    private val _selectedRecipeId = MutableStateFlow<Int?>(null)
+    val selectedRecipeId: StateFlow<Int?> = _selectedRecipeId.asStateFlow()
+
     init {
         loadIngredientCatalogue()
+        loadRecipes()
     }
 
     fun loadIngredientCatalogue() {
@@ -65,6 +77,47 @@ class CreatePostViewModel(
                 IngredientCatalogueUiState.Error(exception.message ?: "Could not load ingredients.")
             }
         }
+    }
+
+    fun loadRecipes() {
+        _recipePickerState.value = PostRecipePickerUiState.Loading
+
+        viewModelScope.launch {
+            _recipePickerState.value = try {
+                val recipes = recipeRepository.getRecipes()
+                    .map {
+                        PostRecipePickerItem(
+                            id = it.id,
+                            title = it.title,
+                            creatorName = if (it.userId == AppConfig.TEMP_USER_ID) {
+                                "Local User"
+                            } else {
+                                null
+                            }
+                        )
+                    }
+
+                if (recipes.isEmpty()) {
+                    PostRecipePickerUiState.Empty
+                } else {
+                    PostRecipePickerUiState.Success(recipes)
+                }
+            } catch (exception: IOException) {
+                PostRecipePickerUiState.Error(
+                    "Could not reach the backend. Recipe links are unavailable."
+                )
+            } catch (exception: HttpException) {
+                PostRecipePickerUiState.Error(
+                    exception.toOperationMessage("Could not load recipes.")
+                )
+            } catch (exception: Exception) {
+                PostRecipePickerUiState.Error(exception.message ?: "Could not load recipes.")
+            }
+        }
+    }
+
+    fun selectRecipe(recipeId: Int?) {
+        _selectedRecipeId.value = recipeId
     }
 
     fun addIngredient(name: String) {
@@ -112,9 +165,11 @@ class CreatePostViewModel(
                 repository.createPost(
                     title = cleanedTitle,
                     ingredients = ingredients,
-                    caption = cleanedCaption
+                    caption = cleanedCaption,
+                    recipeId = _selectedRecipeId.value
                 )
                 _selectedIngredients.value = emptyList()
+                _selectedRecipeId.value = null
                 CreatePostUiState.Success
             } catch (exception: Exception) {
                 CreatePostUiState.Error(exception.toOperationMessage("Could not create post."))

@@ -15,13 +15,15 @@ class CommunityPostRepository(
     suspend fun createPost(
         title: String,
         ingredients: List<String>,
-        caption: String
+        caption: String,
+        recipeId: Int?
     ): CommunityPostResponse {
         return apiService.createCommunityPost(
             CommunityPostCreateRequest(
                 title = title,
                 ingredients = ingredients,
-                caption = caption
+                caption = caption,
+                recipeId = recipeId
             )
         )
     }
@@ -30,14 +32,16 @@ class CommunityPostRepository(
         postId: Int,
         title: String,
         ingredients: List<String>,
-        caption: String
+        caption: String,
+        recipeId: Int?
     ): CommunityPostResponse {
         return apiService.updateCommunityPost(
             postId = postId,
             request = CommunityPostCreateRequest(
                 title = title,
                 ingredients = ingredients,
-                caption = caption
+                caption = caption,
+                recipeId = recipeId
             )
         )
     }

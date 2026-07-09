@@ -11,6 +11,8 @@ import com.example.crumb.ui.screens.recipes.RecipeUiModel
 
 class RecipeAdapter(
     private val onViewRecipe: (RecipeUiModel) -> Unit,
+    private val onSaveRecipe: (RecipeUiModel) -> Unit,
+    private val onUnsaveRecipe: (RecipeUiModel) -> Unit,
     private val onEditRecipe: (RecipeUiModel) -> Unit,
     private val onDeleteRecipe: (RecipeUiModel) -> Unit
 ) : ListAdapter<RecipeUiModel, RecipeAdapter.RecipeViewHolder>(DiffCallback) {
@@ -41,8 +43,16 @@ class RecipeAdapter(
                 .joinToString(", ") { it.displayText() }
             editButton.visibility = if (recipe.isOwnedByLocalUser) View.VISIBLE else View.GONE
             deleteButton.visibility = if (recipe.isOwnedByLocalUser) View.VISIBLE else View.GONE
+            saveButton.text = if (recipe.isSaved) "Saved" else "Save"
 
             viewButton.setOnClickListener { onViewRecipe(recipe) }
+            saveButton.setOnClickListener {
+                if (recipe.isSaved) {
+                    onUnsaveRecipe(recipe)
+                } else {
+                    onSaveRecipe(recipe)
+                }
+            }
             editButton.setOnClickListener { onEditRecipe(recipe) }
             deleteButton.setOnClickListener { onDeleteRecipe(recipe) }
         }

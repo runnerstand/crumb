@@ -9,6 +9,8 @@ import com.example.crumb.data.remote.model.HealthResponse
 import com.example.crumb.data.remote.model.IngredientCategoryResponse
 import com.example.crumb.data.remote.model.RecipeCreateRequest
 import com.example.crumb.data.remote.model.RecipeResponse
+import com.example.crumb.data.remote.model.SavedRecipeCreateRequest
+import com.example.crumb.data.remote.model.SavedRecipeResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -51,6 +53,20 @@ interface ApiService {
     @DELETE("recipes/user-created/{recipe_id}")
     suspend fun deleteRecipe(
         @Path("recipe_id") recipeId: Int
+    ): DeleteMessageResponse
+
+    @GET("recipes/saved")
+    suspend fun getSavedRecipes(): List<SavedRecipeResponse>
+
+    @Headers("Content-Type: application/json")
+    @POST("recipes/saved")
+    suspend fun createSavedRecipe(
+        @Body request: SavedRecipeCreateRequest
+    ): SavedRecipeResponse
+
+    @DELETE("recipes/saved/{recipe_id}")
+    suspend fun deleteSavedRecipe(
+        @Path("recipe_id") savedRecipeId: Int
     ): DeleteMessageResponse
 
     @Headers("Content-Type: application/json")

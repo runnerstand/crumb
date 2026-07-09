@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.crumb.data.remote.model.RecipeIngredientRequest
 import com.example.crumb.data.repository.IngredientRepository
 import com.example.crumb.data.repository.RecipeRepository
+import com.example.crumb.data.repository.SavedRecipeRepository
 import com.example.crumb.ui.screens.create.IngredientCatalogueUiState
 import com.example.crumb.ui.screens.create.IngredientPickerItem
 import com.example.crumb.ui.screens.home.toOperationMessage
@@ -17,7 +18,8 @@ import retrofit2.HttpException
 
 class RecipesViewModel(
     private val repository: RecipeRepository = RecipeRepository(),
-    private val ingredientRepository: IngredientRepository = IngredientRepository()
+    private val ingredientRepository: IngredientRepository = IngredientRepository(),
+    private val savedRecipeRepository: SavedRecipeRepository = SavedRecipeRepository()
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<RecipeUiState>(RecipeUiState.Loading)
     val uiState: StateFlow<RecipeUiState> = _uiState.asStateFlow()
@@ -40,7 +42,14 @@ class RecipesViewModel(
 
         viewModelScope.launch {
             _uiState.value = try {
-                val recipes = repository.getRecipes().map { it.toUiModel() }
+                val savedRecipeIds = savedRecipeRepository.getSavedRecipes()
+                    .mapNotNull { savedRecipe ->
+                        savedRecipe.recipeId?.let { recipeId -> recipeId to savedRecipe.id }
+                    }
+                    .toMap()
+                val recipes = repository.getRecipes().map {
+                    it.toUiModel().copy(savedRecipeId = savedRecipeIds[it.id])
+                }
                 if (recipes.isEmpty()) RecipeUiState.Empty else RecipeUiState.Success(recipes)
             } catch (exception: IOException) {
                 RecipeUiState.Error("Could not reach the backend. Make sure FastAPI is running.")
@@ -48,6 +57,38 @@ class RecipesViewModel(
                 RecipeUiState.Error(exception.toOperationMessage("Could not load recipes."))
             } catch (exception: Exception) {
                 RecipeUiState.Error(exception.message ?: "Could not load recipes.")
+            }
+        }
+    }
+
+    fun saveRecipe(recipe: RecipeUiModel) {
+        if (recipe.isSaved) {
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                savedRecipeRepository.saveRecipe(recipe.toSavedRecipeCreateRequest())
+                _operationMessage.value = "Recipe saved."
+                loadRecipes()
+            } catch (exception: Exception) {
+                _operationMessage.value = exception.toOperationMessage("Could not save recipe.")
+                loadRecipes()
+            }
+        }
+    }
+
+    fun unsaveRecipe(recipe: RecipeUiModel) {
+        val savedRecipeId = recipe.savedRecipeId ?: return
+
+        viewModelScope.launch {
+            try {
+                savedRecipeRepository.unsaveRecipe(savedRecipeId)
+                _operationMessage.value = "Recipe unsaved."
+                loadRecipes()
+            } catch (exception: Exception) {
+                _operationMessage.value = exception.toOperationMessage("Could not unsave recipe.")
+                loadRecipes()
             }
         }
     }

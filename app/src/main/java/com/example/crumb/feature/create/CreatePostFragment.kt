@@ -6,6 +6,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.core.view.children
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -22,6 +23,8 @@ import com.example.crumb.ui.screens.create.CreatePostUiState
 import com.example.crumb.ui.screens.create.CreatePostViewModel
 import com.example.crumb.ui.screens.create.IngredientCatalogueUiState
 import com.example.crumb.ui.screens.create.IngredientPickerItem
+import com.example.crumb.ui.screens.create.PostRecipePickerItem
+import com.example.crumb.ui.screens.create.PostRecipePickerUiState
 import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -33,6 +36,7 @@ class CreatePostFragment : Fragment() {
     private lateinit var ingredientAdapter: IngredientAdapter
     private var allIngredients: List<IngredientPickerItem> = emptyList()
     private var selectedIngredients: List<String> = emptyList()
+    private var recipeOptions: List<PostRecipePickerItem> = emptyList()
     private var selectedCategory: String? = null
     private var query: String = ""
 
@@ -71,6 +75,7 @@ class CreatePostFragment : Fragment() {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.uiState.collect(::renderFormState) }
                 launch { viewModel.catalogueState.collect(::renderCatalogueState) }
+                launch { viewModel.recipePickerState.collect(::renderRecipePickerState) }
                 launch {
                     viewModel.selectedIngredients.collect {
                         selectedIngredients = it
@@ -94,9 +99,65 @@ class CreatePostFragment : Fragment() {
             titleEditText.setText("")
             captionEditText.setText("")
             searchEditText.setText("")
+            recipeAutoCompleteTextView.setText("No linked recipe", false)
             Snackbar.make(root, "Post created.", Snackbar.LENGTH_SHORT).show()
             viewModel.resetState()
             findNavController().navigate(R.id.homeFragment)
+        }
+    }
+
+    private fun renderRecipePickerState(state: PostRecipePickerUiState) = with(binding) {
+        recipeProgressBar.visibility =
+            if (state is PostRecipePickerUiState.Loading) View.VISIBLE else View.GONE
+        recipeStatusTextView.visibility =
+            if (state is PostRecipePickerUiState.Error || state is PostRecipePickerUiState.Empty) {
+                View.VISIBLE
+            } else {
+                View.GONE
+            }
+        recipeInputLayout.isEnabled = state is PostRecipePickerUiState.Success
+
+        when (state) {
+            PostRecipePickerUiState.Loading -> {
+                recipeStatusTextView.text = ""
+                recipeOptions = emptyList()
+                setRecipeDropdown(emptyList())
+            }
+            PostRecipePickerUiState.Empty -> {
+                recipeStatusTextView.text = "No user-created recipes available to link."
+                recipeOptions = emptyList()
+                viewModel.selectRecipe(null)
+                setRecipeDropdown(emptyList())
+            }
+            is PostRecipePickerUiState.Error -> {
+                recipeStatusTextView.text = state.message
+                recipeOptions = emptyList()
+                viewModel.selectRecipe(null)
+                setRecipeDropdown(emptyList())
+            }
+            is PostRecipePickerUiState.Success -> {
+                recipeOptions = state.recipes
+                recipeStatusTextView.text = ""
+                setRecipeDropdown(state.recipes)
+            }
+        }
+    }
+
+    private fun setRecipeDropdown(recipes: List<PostRecipePickerItem>) = with(binding) {
+        val labels = listOf("No linked recipe") + recipes.map { it.displayLabel }
+        val adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            labels
+        )
+        recipeAutoCompleteTextView.setAdapter(adapter)
+        if (recipeAutoCompleteTextView.text.isNullOrBlank() ||
+            recipeOptions.none { it.id == viewModel.selectedRecipeId.value }
+        ) {
+            recipeAutoCompleteTextView.setText("No linked recipe", false)
+        }
+        recipeAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
+            viewModel.selectRecipe(if (position == 0) null else recipes[position - 1].id)
         }
     }
 

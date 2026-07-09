@@ -11,6 +11,8 @@ from app.ingredient_catalog import canonicalize_ingredient
 from app.ingredient_catalog import load_ingredients
 from app.models import CommunityComment
 from app.models import CommunityPost
+from app.models import LOCAL_USER_ID
+from app.models import Recipe
 from app.schemas import CommunityCommentCreate
 from app.schemas import CommunityCommentRead
 from app.schemas import CommunityCommentUpdate
@@ -54,6 +56,23 @@ def normalize_supported_community_ingredients(ingredients: list[str]) -> list[st
     return normalized_ingredients
 
 
+def get_linked_recipe_or_404(recipe_id: int | None, db: Session) -> Recipe | None:
+    if recipe_id is None:
+        return None
+
+    recipe = db.get(Recipe, recipe_id)
+    if recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found.")
+
+    if recipe.user_id != LOCAL_USER_ID:
+        raise HTTPException(
+            status_code=403,
+            detail="Only the recipe owner can link this recipe.",
+        )
+
+    return recipe
+
+
 @router.post(
     "/community/posts",
     response_model=CommunityPostRead,
@@ -64,9 +83,11 @@ def create_community_post(
     db: Session = Depends(get_db),
 ) -> CommunityPost:
     ingredients = normalize_supported_community_ingredients(post.ingredients)
+    linked_recipe = get_linked_recipe_or_404(post.recipe_id, db)
 
     community_post = CommunityPost(
         creator_id=LOCAL_CREATOR_ID,
+        recipe_id=linked_recipe.id if linked_recipe is not None else None,
         creator_name=LOCAL_CREATOR_NAME,
         title=post.title,
         ingredients_json=ingredients,
@@ -103,7 +124,10 @@ def update_community_post(
             detail="Only the post creator can update this post.",
         )
 
+    linked_recipe = get_linked_recipe_or_404(post.recipe_id, db)
+
     community_post.title = post.title
+    community_post.recipe_id = linked_recipe.id if linked_recipe is not None else None
     community_post.ingredients_json = normalize_supported_community_ingredients(
         post.ingredients
     )

@@ -7,6 +7,7 @@ from pydantic import field_validator
 
 
 class SavedRecipeCreate(BaseModel):
+    recipe_id: int | None = None
     title: str = Field(min_length=1)
     ingredients: list[str] = Field(min_length=1)
     ingredient_measurements: list[dict] = Field(default_factory=list)
@@ -37,6 +38,7 @@ class SavedRecipeRead(SavedRecipeCreate):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    user_id: str
     created_at: datetime
 
 
@@ -114,6 +116,7 @@ class CommunityPostCreate(BaseModel):
     title: str = Field(min_length=1)
     ingredients: list[str] = Field(min_length=1)
     caption: str = Field(default="", max_length=200)
+    recipe_id: int | None = None
 
     @field_validator("title")
     @classmethod
@@ -148,6 +151,7 @@ class CommunityPostRead(BaseModel):
 
     id: int
     creator_id: str
+    recipe_id: int | None = None
     creator_name: str
     title: str
     ingredients_json: list[str]

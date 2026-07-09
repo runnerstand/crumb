@@ -2,6 +2,7 @@ package com.example.crumb.ui.screens.home
 
 import com.example.crumb.core.config.AppConfig
 import com.example.crumb.data.remote.model.CommunityPostResponse
+import com.example.crumb.ui.screens.recipes.RecipeUiModel
 
 sealed interface CommunityPostUiState {
     data object Loading : CommunityPostUiState
@@ -13,6 +14,8 @@ sealed interface CommunityPostUiState {
 data class CommunityPostUiModel(
     val id: Int,
     val creatorId: String,
+    val recipeId: Int?,
+    val linkedRecipe: RecipeUiModel?,
     val creatorName: String,
     val title: String,
     val ingredients: List<String>,
@@ -22,10 +25,12 @@ data class CommunityPostUiModel(
     val isOwnedByLocalUser: Boolean
 )
 
-fun CommunityPostResponse.toUiModel(): CommunityPostUiModel {
+fun CommunityPostResponse.toUiModel(recipesById: Map<Int, RecipeUiModel> = emptyMap()): CommunityPostUiModel {
     return CommunityPostUiModel(
         id = id,
         creatorId = creatorId,
+        recipeId = recipeId,
+        linkedRecipe = recipeId?.let { recipesById[it] },
         creatorName = creatorName,
         title = title,
         ingredients = ingredientsJson,

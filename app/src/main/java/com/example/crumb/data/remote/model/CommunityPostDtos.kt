@@ -8,13 +8,17 @@ data class CommunityPostCreateRequest(
     @Json(name = "ingredients")
     val ingredients: List<String>,
     @Json(name = "caption")
-    val caption: String
+    val caption: String,
+    @Json(name = "recipe_id")
+    val recipeId: Int? = null
 )
 
 data class CommunityPostResponse(
     val id: Int,
     @Json(name = "creator_id")
     val creatorId: String,
+    @Json(name = "recipe_id")
+    val recipeId: Int? = null,
     @Json(name = "creator_name")
     val creatorName: String,
     val title: String,

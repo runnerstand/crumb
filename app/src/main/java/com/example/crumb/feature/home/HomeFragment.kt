@@ -23,6 +23,7 @@ import com.example.crumb.ui.screens.comments.CommunityCommentUiState
 import com.example.crumb.ui.screens.home.CommunityPostUiModel
 import com.example.crumb.ui.screens.home.CommunityPostUiState
 import com.example.crumb.ui.screens.home.HomeViewModel
+import com.example.crumb.ui.screens.recipes.RecipeUiModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -46,6 +47,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         postAdapter = CommunityPostAdapter(
             onOpenComments = ::showCommentsDialog,
+            onOpenRecipe = ::showRecipeDetails,
             onUpdatePost = viewModel::updatePost,
             onDeletePost = ::confirmDeletePost
         )
@@ -56,6 +58,7 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.uiState.collect(::renderPosts) }
+                launch { viewModel.recipes.collect { postAdapter.submitRecipes(it) } }
                 launch {
                     viewModel.operationMessage.collect { message ->
                         message ?: return@collect
@@ -108,6 +111,26 @@ class HomeFragment : Fragment() {
             .setMessage("This will also remove its comments.")
             .setNegativeButton("Cancel", null)
             .setPositiveButton("Delete") { _, _ -> viewModel.deletePost(post.id) }
+            .show()
+    }
+
+    private fun showRecipeDetails(recipe: RecipeUiModel) {
+        val details = buildString {
+            recipe.cookingTimeMinutes?.let { appendLine("Cooking time: $it minutes") }
+            appendLine()
+            appendLine("Ingredients")
+            recipe.ingredients.forEach { appendLine("- ${it.displayText()}") }
+            appendLine()
+            appendLine("Instructions")
+            recipe.instructions.forEachIndexed { index, step ->
+                appendLine("${index + 1}. $step")
+            }
+        }.trim()
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(recipe.title)
+            .setMessage(details)
+            .setPositiveButton("Close", null)
             .show()
     }
 

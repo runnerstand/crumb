@@ -19,3 +19,19 @@ data class IngredientPickerItem(
     val category: String,
     val tags: List<String>
 )
+
+sealed interface PostRecipePickerUiState {
+    data object Loading : PostRecipePickerUiState
+    data object Empty : PostRecipePickerUiState
+    data class Success(val recipes: List<PostRecipePickerItem>) : PostRecipePickerUiState
+    data class Error(val message: String) : PostRecipePickerUiState
+}
+
+data class PostRecipePickerItem(
+    val id: Int,
+    val title: String,
+    val creatorName: String?
+) {
+    val displayLabel: String
+        get() = if (creatorName.isNullOrBlank()) title else "$title by $creatorName"
+}

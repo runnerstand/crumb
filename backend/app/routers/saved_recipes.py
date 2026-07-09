@@ -4,6 +4,8 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.models import LOCAL_USER_ID
+from app.models import Recipe
 from app.models import SavedRecipe
 from app.schemas import SavedRecipeCreate
 from app.schemas import SavedRecipeRead
@@ -17,7 +19,27 @@ def create_saved_recipe(
     recipe: SavedRecipeCreate,
     db: Session = Depends(get_db),
 ) -> SavedRecipe:
+    if recipe.recipe_id is not None:
+        source_recipe = db.get(Recipe, recipe.recipe_id)
+
+        if source_recipe is None:
+            raise HTTPException(status_code=404, detail="Recipe not found.")
+
+        existing_saved_recipe = (
+            db.query(SavedRecipe)
+            .filter(
+                SavedRecipe.user_id == LOCAL_USER_ID,
+                SavedRecipe.recipe_id == recipe.recipe_id,
+            )
+            .first()
+        )
+
+        if existing_saved_recipe is not None:
+            raise HTTPException(status_code=409, detail="Recipe already saved.")
+
     saved_recipe = SavedRecipe(
+        user_id=LOCAL_USER_ID,
+        recipe_id=recipe.recipe_id,
         title=recipe.title,
         ingredients=recipe.ingredients,
         ingredient_measurements=recipe.ingredient_measurements,
@@ -35,7 +57,12 @@ def create_saved_recipe(
 
 @router.get("/recipes/saved", response_model=list[SavedRecipeRead])
 def list_saved_recipes(db: Session = Depends(get_db)) -> list[SavedRecipe]:
-    return db.query(SavedRecipe).order_by(SavedRecipe.created_at.desc()).all()
+    return (
+        db.query(SavedRecipe)
+        .filter(SavedRecipe.user_id == LOCAL_USER_ID)
+        .order_by(SavedRecipe.created_at.desc())
+        .all()
+    )
 
 
 @router.delete("/recipes/saved/{recipe_id}")
@@ -44,6 +71,12 @@ def delete_saved_recipe(recipe_id: int, db: Session = Depends(get_db)) -> dict[s
 
     if saved_recipe is None:
         raise HTTPException(status_code=404, detail="Saved recipe not found.")
+
+    if saved_recipe.user_id != LOCAL_USER_ID:
+        raise HTTPException(
+            status_code=403,
+            detail="Only the recipe saver can delete this saved recipe.",
+        )
 
     db.delete(saved_recipe)
     db.commit()

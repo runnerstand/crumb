@@ -3,18 +3,27 @@ package com.example.crumb.ui.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.crumb.databinding.ItemCommunityPostBinding
 import com.example.crumb.ui.screens.home.CommunityPostUiModel
+import com.example.crumb.ui.screens.recipes.RecipeUiModel
 
 class CommunityPostAdapter(
     private val onOpenComments: (CommunityPostUiModel) -> Unit,
-    private val onUpdatePost: (Int, String, List<String>, String) -> Unit,
+    private val onOpenRecipe: (RecipeUiModel) -> Unit,
+    private val onUpdatePost: (Int, String, List<String>, String, Int?) -> Unit,
     private val onDeletePost: (CommunityPostUiModel) -> Unit
 ) : ListAdapter<CommunityPostUiModel, CommunityPostAdapter.PostViewHolder>(DiffCallback) {
     private val editingPostIds = mutableSetOf<Int>()
+    private var recipes: List<RecipeUiModel> = emptyList()
+
+    fun submitRecipes(recipes: List<RecipeUiModel>) {
+        this.recipes = recipes
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val binding = ItemCommunityPostBinding.inflate(
@@ -39,6 +48,23 @@ class CommunityPostAdapter(
             postTitleTextView.text = post.title
             postCreatorTextView.text = "By ${post.creatorName}"
             postIngredientsTextView.text = "Ingredients: ${post.ingredients.joinToString(", ")}"
+            linkedRecipeTextView.visibility = if (post.recipeId == null) View.GONE else View.VISIBLE
+            linkedRecipeTextView.text = when {
+                post.linkedRecipe != null -> {
+                    val creator = if (post.linkedRecipe.isOwnedByLocalUser) {
+                        "Local User"
+                    } else {
+                        post.linkedRecipe.userId
+                    }
+                    "Recipe: ${post.linkedRecipe.title}\nCreator: $creator"
+                }
+                post.recipeId != null -> "Recipe linked: #${post.recipeId}"
+                else -> ""
+            }
+            linkedRecipeTextView.setOnClickListener {
+                post.linkedRecipe?.let(onOpenRecipe)
+            }
+            linkedRecipeTextView.isEnabled = post.linkedRecipe != null
             postCaptionTextView.text = post.caption
             postCaptionTextView.visibility = if (post.caption.isBlank()) View.GONE else View.VISIBLE
             postDatesTextView.text = "Created ${post.createdAt} | Updated ${post.updatedAt}"
@@ -57,6 +83,23 @@ class CommunityPostAdapter(
                 editIngredientsEditText.setText(post.ingredients.joinToString(", "))
                 editCaptionEditText.setText(post.caption)
                 editValidationTextView.text = ""
+                var selectedRecipeId = post.recipeId
+                val recipeLabels = listOf("No linked recipe") + recipes.map { it.title }
+                editRecipeAutoCompleteTextView.setAdapter(
+                    ArrayAdapter(
+                        itemView.context,
+                        android.R.layout.simple_dropdown_item_1line,
+                        recipeLabels
+                    )
+                )
+                val selectedRecipeIndex = recipes.indexOfFirst { it.id == selectedRecipeId }
+                editRecipeAutoCompleteTextView.setText(
+                    if (selectedRecipeIndex >= 0) recipes[selectedRecipeIndex].title else "No linked recipe",
+                    false
+                )
+                editRecipeAutoCompleteTextView.setOnItemClickListener { _, _, position, _ ->
+                    selectedRecipeId = if (position == 0) null else recipes[position - 1].id
+                }
 
                 saveButton.setOnClickListener {
                     val cleanedIngredients = editIngredientsEditText.text.toString()
@@ -77,7 +120,8 @@ class CommunityPostAdapter(
                             post.id,
                             editTitleEditText.text.toString(),
                             cleanedIngredients,
-                            editCaptionEditText.text.toString()
+                            editCaptionEditText.text.toString(),
+                            selectedRecipeId
                         )
                     } else {
                         editValidationTextView.text = validation
