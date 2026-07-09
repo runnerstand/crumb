@@ -97,6 +97,7 @@ class RecipeIngredient(Base):
         primary_key=True,
     )
     quantity: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    unit: Mapped[str | None] = mapped_column(String(100), nullable=True)
 
     recipe: Mapped[Recipe] = relationship(back_populates="ingredients")
     ingredient: Mapped[Ingredient] = relationship(back_populates="recipes")

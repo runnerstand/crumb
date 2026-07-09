@@ -7,6 +7,8 @@ import com.example.crumb.data.remote.model.CommunityPostResponse
 import com.example.crumb.data.remote.model.DeleteMessageResponse
 import com.example.crumb.data.remote.model.HealthResponse
 import com.example.crumb.data.remote.model.IngredientCategoryResponse
+import com.example.crumb.data.remote.model.RecipeCreateRequest
+import com.example.crumb.data.remote.model.RecipeResponse
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -24,6 +26,32 @@ interface ApiService {
 
     @GET("ingredients/categories")
     suspend fun getIngredientCategories(): List<IngredientCategoryResponse>
+
+    @GET("recipes/user-created")
+    suspend fun getRecipes(): List<RecipeResponse>
+
+    @GET("recipes/user-created/{recipe_id}")
+    suspend fun getRecipe(
+        @Path("recipe_id") recipeId: Int
+    ): RecipeResponse
+
+    @Headers("Content-Type: application/json")
+    @POST("recipes/user-created")
+    suspend fun createRecipe(
+        @Body request: RecipeCreateRequest
+    ): RecipeResponse
+
+    @Headers("Content-Type: application/json")
+    @PATCH("recipes/user-created/{recipe_id}")
+    suspend fun updateRecipe(
+        @Path("recipe_id") recipeId: Int,
+        @Body request: RecipeCreateRequest
+    ): RecipeResponse
+
+    @DELETE("recipes/user-created/{recipe_id}")
+    suspend fun deleteRecipe(
+        @Path("recipe_id") recipeId: Int
+    ): DeleteMessageResponse
 
     @Headers("Content-Type: application/json")
     @POST("community/posts")

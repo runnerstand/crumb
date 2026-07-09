@@ -7,18 +7,31 @@ from urllib import error
 from urllib import request as urllib_request
 
 from fastapi import APIRouter
+from fastapi import Depends
 from fastapi import HTTPException
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import field_validator
+from sqlalchemy.orm import Session
+from sqlalchemy.orm import selectinload
 
+from app.database import get_db
 from app.ingredient_catalog import build_warning_tags
 from app.ingredient_catalog import canonicalize_ingredient
 from app.ingredient_catalog import load_ingredients
 from app.ingredient_catalog import normalize_ingredient
 from app.measurement_conversion import MeasurementSystem
 from app.measurement_conversion import convert_measurement_text
+from app.models import Ingredient
+from app.models import LOCAL_USER_ID
+from app.models import LOCAL_USER_NAME
+from app.models import Recipe
+from app.models import RecipeIngredient
+from app.models import User
 from app.recipe_retrieval import SemanticRecipeRetriever
+from app.schemas import RecipeCreate
+from app.schemas import RecipeRead
+from app.schemas import RecipeUpdate
 
 
 router = APIRouter()
@@ -46,6 +59,193 @@ ALLOWED_EXCLUDED_WARNING_TAGS = {
 WARNING_TAG_ALIASES = {
     "egg": "eggs",
 }
+
+
+def ensure_local_user(db: Session) -> None:
+    if db.get(User, LOCAL_USER_ID) is not None:
+        return
+
+    db.add(User(id=LOCAL_USER_ID, display_name=LOCAL_USER_NAME))
+    db.flush()
+
+
+def serialize_recipe(recipe: Recipe) -> dict[str, Any]:
+    return {
+        "id": recipe.id,
+        "user_id": recipe.user_id,
+        "title": recipe.title,
+        "ingredients": [
+            {
+                "ingredient_id": recipe_ingredient.ingredient_id,
+                "ingredient_name": recipe_ingredient.ingredient.name,
+                "quantity": recipe_ingredient.quantity,
+                "unit": recipe_ingredient.unit,
+            }
+            for recipe_ingredient in sorted(
+                recipe.ingredients,
+                key=lambda item: item.ingredient.name,
+            )
+        ],
+        "instructions": recipe.instructions,
+        "cooking_time_minutes": recipe.cooking_time_minutes,
+        "created_at": recipe.created_at,
+    }
+
+
+def get_recipe_or_404(recipe_id: int, db: Session) -> Recipe:
+    recipe = (
+        db.query(Recipe)
+        .options(selectinload(Recipe.ingredients).selectinload(RecipeIngredient.ingredient))
+        .filter(Recipe.id == recipe_id)
+        .first()
+    )
+
+    if recipe is None:
+        raise HTTPException(status_code=404, detail="Recipe not found.")
+
+    return recipe
+
+
+def find_supported_ingredient(ingredient_name: str, db: Session) -> Ingredient:
+    catalogue = load_ingredients()
+    normalized_ingredient = canonicalize_ingredient(ingredient_name, catalogue)
+    catalogue_by_name = {ingredient.name: ingredient for ingredient in catalogue}
+
+    if not normalized_ingredient or normalized_ingredient not in catalogue_by_name:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported ingredient: {ingredient_name.strip()}",
+        )
+
+    ingredient = db.query(Ingredient).filter(Ingredient.name == normalized_ingredient).first()
+
+    if ingredient is not None:
+        return ingredient
+
+    catalogue_ingredient = catalogue_by_name[normalized_ingredient]
+    ingredient = Ingredient(
+        name=catalogue_ingredient.name,
+        category=catalogue_ingredient.category,
+        aliases=list(catalogue_ingredient.aliases),
+        warning_tags=list(catalogue_ingredient.warning_tags),
+        needs_review=catalogue_ingredient.needs_review,
+    )
+    db.add(ingredient)
+    db.flush()
+
+    return ingredient
+
+
+def replace_recipe_ingredients(
+    recipe: Recipe,
+    payload: RecipeCreate | RecipeUpdate,
+    db: Session,
+) -> None:
+    recipe.ingredients.clear()
+    seen_ingredient_ids: set[int] = set()
+
+    for requested_ingredient in payload.ingredients:
+        ingredient = find_supported_ingredient(requested_ingredient.ingredient_name, db)
+
+        if ingredient.id in seen_ingredient_ids:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Duplicate ingredient: {ingredient.name}",
+            )
+
+        seen_ingredient_ids.add(ingredient.id)
+        recipe.ingredients.append(
+            RecipeIngredient(
+                ingredient_id=ingredient.id,
+                quantity=requested_ingredient.quantity,
+                unit=requested_ingredient.unit,
+            )
+        )
+
+
+@router.post("/recipes/user-created", response_model=RecipeRead, status_code=201)
+def create_user_recipe(
+    recipe_request: RecipeCreate,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    ensure_local_user(db)
+    recipe = Recipe(
+        user_id=LOCAL_USER_ID,
+        title=recipe_request.title,
+        instructions=recipe_request.instructions,
+        cooking_time_minutes=recipe_request.cooking_time_minutes,
+    )
+    replace_recipe_ingredients(recipe, recipe_request, db)
+
+    db.add(recipe)
+    db.commit()
+    db.refresh(recipe)
+
+    return serialize_recipe(get_recipe_or_404(recipe.id, db))
+
+
+@router.get("/recipes/user-created", response_model=list[RecipeRead])
+def list_user_recipes(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
+    recipes = (
+        db.query(Recipe)
+        .options(selectinload(Recipe.ingredients).selectinload(RecipeIngredient.ingredient))
+        .filter(Recipe.user_id == LOCAL_USER_ID)
+        .order_by(Recipe.created_at.desc())
+        .all()
+    )
+
+    return [serialize_recipe(recipe) for recipe in recipes]
+
+
+@router.get("/recipes/user-created/{recipe_id}", response_model=RecipeRead)
+def read_user_recipe(
+    recipe_id: int,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    recipe = get_recipe_or_404(recipe_id, db)
+
+    if recipe.user_id != LOCAL_USER_ID:
+        raise HTTPException(status_code=403, detail="Only the recipe owner can view this recipe.")
+
+    return serialize_recipe(recipe)
+
+
+@router.patch("/recipes/user-created/{recipe_id}", response_model=RecipeRead)
+def update_user_recipe(
+    recipe_id: int,
+    recipe_request: RecipeUpdate,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    recipe = get_recipe_or_404(recipe_id, db)
+
+    if recipe.user_id != LOCAL_USER_ID:
+        raise HTTPException(status_code=403, detail="Only the recipe owner can update this recipe.")
+
+    recipe.title = recipe_request.title
+    recipe.instructions = recipe_request.instructions
+    recipe.cooking_time_minutes = recipe_request.cooking_time_minutes
+    replace_recipe_ingredients(recipe, recipe_request, db)
+
+    db.commit()
+    db.refresh(recipe)
+
+    return serialize_recipe(get_recipe_or_404(recipe.id, db))
+
+
+@router.delete("/recipes/user-created/{recipe_id}")
+def delete_user_recipe(
+    recipe_id: int,
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
+    recipe = get_recipe_or_404(recipe_id, db)
+
+    if recipe.user_id != LOCAL_USER_ID:
+        raise HTTPException(status_code=403, detail="Only the recipe owner can delete this recipe.")
+
+    db.delete(recipe)
+    db.commit()
+
+    return {"message": "Recipe deleted."}
 
 
 class RecipeMatchRequest(BaseModel):

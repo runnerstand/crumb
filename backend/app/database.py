@@ -358,6 +358,14 @@ def migrate_mysql_erd_schema() -> None:
                 text("ALTER TABLE ingredients MODIFY needs_review BOOL NOT NULL")
             )
 
+        if "recipe_ingredients" in existing_tables:
+            add_column_if_missing(
+                connection,
+                "recipe_ingredients",
+                "unit",
+                "unit VARCHAR(100) NULL",
+            )
+
         add_mysql_foreign_keys(connection)
 
 
@@ -475,4 +483,12 @@ def init_db() -> None:
     add_missing_community_posts_updated_at_column()
     add_missing_saved_recipes_measurements_column()
     Base.metadata.create_all(bind=engine)
+    if engine.dialect.name == "sqlite" and "recipe_ingredients" in table_names():
+        with engine.begin() as connection:
+            add_column_if_missing(
+                connection,
+                "recipe_ingredients",
+                "unit",
+                "unit VARCHAR(100)",
+            )
     migrate_mysql_erd_schema()
