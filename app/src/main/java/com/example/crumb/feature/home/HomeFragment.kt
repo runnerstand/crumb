@@ -13,7 +13,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.crumb.R
 import com.example.crumb.databinding.DialogCommentsBinding
 import com.example.crumb.databinding.FragmentHomeBinding
 import com.example.crumb.ui.adapter.CommentAdapter
@@ -22,8 +24,10 @@ import com.example.crumb.ui.screens.comments.CommentsViewModel
 import com.example.crumb.ui.screens.comments.CommunityCommentUiState
 import com.example.crumb.ui.screens.home.CommunityPostUiModel
 import com.example.crumb.ui.screens.home.CommunityPostUiState
+import com.example.crumb.ui.screens.home.HomeDashboardUiState
 import com.example.crumb.ui.screens.home.HomeViewModel
 import com.example.crumb.ui.screens.recipes.RecipeUiModel
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -34,6 +38,7 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var postAdapter: CommunityPostAdapter
     private var commentsDialog: Dialog? = null
+    private var dailyRecipe: RecipeUiModel? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,10 +59,29 @@ class HomeFragment : Fragment() {
         binding.postsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.postsRecyclerView.adapter = postAdapter
         binding.retryButton.setOnClickListener { viewModel.loadPosts() }
+        binding.searchRecipesButton.setOnClickListener {
+            findNavController().navigate(R.id.searchFragment)
+        }
+        binding.addRecipeButton.setOnClickListener {
+            findNavController().navigate(
+                R.id.recipesFragment,
+                Bundle().apply { putBoolean("open_create_recipe", true) }
+            )
+        }
+        binding.createPostButton.setOnClickListener {
+            findNavController().navigate(R.id.createPostFragment)
+        }
+        binding.savedRecipesButton.setOnClickListener {
+            findNavController().navigate(R.id.savedFragment)
+        }
+        binding.viewDailyRecipeButton.setOnClickListener {
+            dailyRecipe?.let(::showRecipeDetails)
+        }
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch { viewModel.uiState.collect(::renderPosts) }
+                launch { viewModel.dashboardUiState.collect(::renderDashboard) }
                 launch { viewModel.recipes.collect { postAdapter.submitRecipes(it) } }
                 launch {
                     viewModel.operationMessage.collect { message ->
@@ -67,6 +91,71 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun renderDashboard(state: HomeDashboardUiState) = with(binding) {
+        when (state) {
+            HomeDashboardUiState.Loading -> {
+                dailyRecipeTitleTextView.text = "Loading recipe ideas..."
+                dailyRecipeMetaTextView.text = ""
+                dailyRecipeIngredientsTextView.text = ""
+                viewDailyRecipeButton.visibility = View.GONE
+                categoryChipGroup.removeAllViews()
+            }
+            is HomeDashboardUiState.Error -> {
+                dailyRecipeTitleTextView.text = "No recipe suggestion yet"
+                dailyRecipeMetaTextView.text = ""
+                dailyRecipeIngredientsTextView.text = state.message
+                viewDailyRecipeButton.visibility = View.GONE
+                categoryChipGroup.removeAllViews()
+            }
+            is HomeDashboardUiState.Success -> {
+                dailyRecipe = state.dailyRecipe
+                renderDailyRecipe(state.dailyRecipe)
+                renderCategoryChips(state.categories)
+            }
+        }
+    }
+
+    private fun renderDailyRecipe(recipe: RecipeUiModel?) = with(binding) {
+        if (recipe == null) {
+            dailyRecipeTitleTextView.text = "Create a recipe to get a daily idea"
+            dailyRecipeMetaTextView.text = ""
+            dailyRecipeIngredientsTextView.text =
+                "Your first user-created recipe will appear here as a cooking suggestion."
+            viewDailyRecipeButton.visibility = View.GONE
+            return
+        }
+
+        dailyRecipeTitleTextView.text = recipe.title
+        dailyRecipeMetaTextView.text = listOfNotNull(
+            recipe.cookingTimeMinutes?.let { "$it min" },
+            "${recipe.ingredients.size} ingredients"
+        ).joinToString(" | ")
+        dailyRecipeIngredientsTextView.text = recipe.ingredients
+            .take(5)
+            .joinToString(", ") { it.displayText() }
+        viewDailyRecipeButton.visibility = View.VISIBLE
+    }
+
+    private fun renderCategoryChips(categories: List<String>) = with(binding.categoryChipGroup) {
+        removeAllViews()
+        if (categories.isEmpty()) {
+            addView(Chip(requireContext()).apply {
+                text = "No categories yet"
+                isEnabled = false
+            })
+            return
+        }
+
+        categories.forEach { category ->
+            addView(Chip(requireContext()).apply {
+                text = category.replaceFirstChar { it.uppercase() }
+                setOnClickListener {
+                    findNavController().navigate(R.id.searchFragment)
+                }
+            })
         }
     }
 

@@ -3,10 +3,12 @@ package com.example.crumb.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.crumb.data.repository.CommunityPostRepository
+import com.example.crumb.data.repository.IngredientRepository
 import com.example.crumb.data.repository.RecipeRepository
 import com.example.crumb.ui.screens.recipes.RecipeUiModel
 import com.example.crumb.ui.screens.recipes.toUiModel
 import java.io.IOException
+import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +17,8 @@ import retrofit2.HttpException
 
 class HomeViewModel(
     private val repository: CommunityPostRepository = CommunityPostRepository(),
-    private val recipeRepository: RecipeRepository = RecipeRepository()
+    private val recipeRepository: RecipeRepository = RecipeRepository(),
+    private val ingredientRepository: IngredientRepository = IngredientRepository()
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<CommunityPostUiState>(CommunityPostUiState.Loading)
     val uiState: StateFlow<CommunityPostUiState> = _uiState.asStateFlow()
@@ -25,6 +28,11 @@ class HomeViewModel(
 
     private val _recipes = MutableStateFlow<List<RecipeUiModel>>(emptyList())
     val recipes: StateFlow<List<RecipeUiModel>> = _recipes.asStateFlow()
+
+    private val _dashboardUiState = MutableStateFlow<HomeDashboardUiState>(
+        HomeDashboardUiState.Loading
+    )
+    val dashboardUiState: StateFlow<HomeDashboardUiState> = _dashboardUiState.asStateFlow()
 
     init {
         loadPosts()
@@ -44,6 +52,7 @@ class HomeViewModel(
                     emptyList()
                 }
                 _recipes.value = recipes
+                loadDashboard(recipes)
 
                 val recipesById = recipes.associateBy { it.id }
                 val posts = repository.getPosts().map { it.toUiModel(recipesById) }
@@ -60,6 +69,35 @@ class HomeViewModel(
                 CommunityPostUiState.Error(exception.message ?: "Could not load community posts.")
             }
         }
+    }
+
+    private suspend fun loadDashboard(recipes: List<RecipeUiModel>) {
+        _dashboardUiState.value = try {
+            val categories = ingredientRepository.getIngredients()
+                .map { it.category }
+                .filter { it.isNotBlank() }
+                .distinct()
+                .sorted()
+                .take(8)
+
+            HomeDashboardUiState.Success(
+                dailyRecipe = selectDailyRecipe(recipes),
+                categories = categories
+            )
+        } catch (exception: Exception) {
+            HomeDashboardUiState.Error(
+                exception.toOperationMessage("Could not load dashboard.")
+            )
+        }
+    }
+
+    private fun selectDailyRecipe(recipes: List<RecipeUiModel>): RecipeUiModel? {
+        if (recipes.isEmpty()) {
+            return null
+        }
+
+        val dayIndex = LocalDate.now().dayOfYear % recipes.size
+        return recipes.sortedBy { it.id }[dayIndex]
     }
 
     fun updatePost(

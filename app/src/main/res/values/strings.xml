@@ -2,6 +2,9 @@
     <string name="app_name">Crumb</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_add">Add</string>
+    <string name="nav_saved">Saved</string>
     <string name="nav_create">Create</string>
     <string name="nav_recipes">Recipes</string>
     <string name="nav_profile">Profile</string>

@@ -68,6 +68,11 @@ class RecipesFragment : Fragment() {
                 }
             }
         }
+
+        if (savedInstanceState == null && arguments?.getBoolean("open_create_recipe") == true) {
+            showCreateRecipeDialog()
+            arguments?.putBoolean("open_create_recipe", false)
+        }
     }
 
     override fun onResume() {

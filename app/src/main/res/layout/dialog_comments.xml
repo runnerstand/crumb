@@ -10,7 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Comments"
-        android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+        android:textAppearance="?attr/textAppearanceHeadlineMedium"
+        android:textStyle="bold" />
+
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/newCommentInputLayout"

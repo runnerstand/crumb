@@ -11,6 +11,15 @@ sealed interface CommunityPostUiState {
     data class Error(val message: String) : CommunityPostUiState
 }
 
+sealed interface HomeDashboardUiState {
+    data object Loading : HomeDashboardUiState
+    data class Success(
+        val dailyRecipe: RecipeUiModel?,
+        val categories: List<String>
+    ) : HomeDashboardUiState
+    data class Error(val message: String) : HomeDashboardUiState
+}
+
 data class CommunityPostUiModel(
     val id: Int,
     val creatorId: String,

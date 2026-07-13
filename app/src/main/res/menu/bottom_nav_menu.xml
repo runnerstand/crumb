@@ -4,13 +4,17 @@
         android:icon="@drawable/ic_home"
         android:title="@string/nav_home" />
     <item
-        android:id="@+id/createPostFragment"
-        android:icon="@drawable/ic_add"
-        android:title="@string/nav_create" />
+        android:id="@+id/searchFragment"
+        android:icon="@drawable/ic_search"
+        android:title="@string/nav_search" />
     <item
-        android:id="@+id/recipesFragment"
-        android:icon="@drawable/ic_recipes"
-        android:title="@string/nav_recipes" />
+        android:id="@+id/addFragment"
+        android:icon="@drawable/ic_add"
+        android:title="@string/nav_add" />
+    <item
+        android:id="@+id/savedFragment"
+        android:icon="@drawable/ic_saved"
+        android:title="@string/nav_saved" />
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/ic_profile"

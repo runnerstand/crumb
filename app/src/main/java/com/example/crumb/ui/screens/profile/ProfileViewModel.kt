@@ -2,71 +2,62 @@ package com.example.crumb.ui.screens.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.crumb.core.config.AppConfig
+import com.example.crumb.data.repository.CommunityPostRepository
 import com.example.crumb.data.repository.HealthRepository
+import com.example.crumb.data.repository.RecipeRepository
 import com.example.crumb.data.repository.SavedRecipeRepository
 import com.example.crumb.ui.screens.home.toOperationMessage
-import com.example.crumb.ui.screens.recipes.SavedRecipeUiState
 import com.example.crumb.ui.screens.recipes.toUiModel
+import java.io.IOException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 class ProfileViewModel(
     private val healthRepository: HealthRepository = HealthRepository(),
-    private val savedRecipeRepository: SavedRecipeRepository = SavedRecipeRepository()
+    private val recipeRepository: RecipeRepository = RecipeRepository(),
+    private val savedRecipeRepository: SavedRecipeRepository = SavedRecipeRepository(),
+    private val communityPostRepository: CommunityPostRepository = CommunityPostRepository()
 ) : ViewModel() {
-    private val _healthUiState = MutableStateFlow<HealthUiState>(HealthUiState.Loading)
-    val healthUiState: StateFlow<HealthUiState> = _healthUiState.asStateFlow()
-
-    private val _savedRecipeUiState = MutableStateFlow<SavedRecipeUiState>(
-        SavedRecipeUiState.Loading
-    )
-    val savedRecipeUiState: StateFlow<SavedRecipeUiState> = _savedRecipeUiState.asStateFlow()
+    private val _profileUiState = MutableStateFlow<ProfileUiState>(ProfileUiState.Loading)
+    val profileUiState: StateFlow<ProfileUiState> = _profileUiState.asStateFlow()
 
     init {
-        checkBackendHealth()
-        loadSavedRecipes()
+        loadProfile()
     }
 
-    fun checkBackendHealth() {
-        _healthUiState.value = HealthUiState.Loading
+    fun loadProfile() {
+        _profileUiState.value = ProfileUiState.Loading
 
         viewModelScope.launch {
-            _healthUiState.value = try {
-                val response = healthRepository.checkHealth()
-                HealthUiState.Success(status = response.status)
+            val backendStatus = try {
+                healthRepository.checkHealth().status
             } catch (exception: IOException) {
-                HealthUiState.Error(
-                    message = "Could not reach the backend. Make sure FastAPI is running."
-                )
+                "Offline"
             } catch (exception: Exception) {
-                HealthUiState.Error(
-                    message = exception.message ?: "Backend health check failed."
-                )
+                exception.message ?: "Unavailable"
             }
-        }
-    }
 
-    fun loadSavedRecipes() {
-        _savedRecipeUiState.value = SavedRecipeUiState.Loading
+            _profileUiState.value = try {
+                val myRecipes = recipeRepository.getRecipes()
+                    .map { it.toUiModel() }
+                    .filter { it.userId == AppConfig.TEMP_USER_ID }
+                val savedRecipes = savedRecipeRepository.getSavedRecipes().map { it.toUiModel() }
+                val myPostsCount = communityPostRepository.getPosts()
+                    .count { it.creatorId == AppConfig.TEMP_USER_ID }
 
-        viewModelScope.launch {
-            _savedRecipeUiState.value = try {
-                val recipes = savedRecipeRepository.getSavedRecipes().map { it.toUiModel() }
-                if (recipes.isEmpty()) {
-                    SavedRecipeUiState.Empty
-                } else {
-                    SavedRecipeUiState.Success(recipes)
-                }
-            } catch (exception: IOException) {
-                SavedRecipeUiState.Error(
-                    message = "Could not reach the backend. Make sure FastAPI is running."
+                ProfileUiState.Success(
+                    myRecipes = myRecipes,
+                    savedRecipes = savedRecipes,
+                    myPostsCount = myPostsCount,
+                    backendStatus = backendStatus
                 )
             } catch (exception: Exception) {
-                SavedRecipeUiState.Error(
-                    message = exception.toOperationMessage("Could not load saved recipes.")
+                ProfileUiState.Error(
+                    message = exception.toOperationMessage("Could not load profile."),
+                    backendStatus = backendStatus
                 )
             }
         }

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFF8EF"
     android:fillViewport="true">
 
     <LinearLayout
@@ -14,14 +16,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Profile"
-            android:textAppearance="?attr/textAppearanceHeadlineSmall" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="Backend connection"
-            android:textAppearance="?attr/textAppearanceTitleMedium" />
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
+            android:textColor="#2F241A"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
         <ProgressBar
             android:id="@+id/healthProgressBar"
@@ -31,51 +29,178 @@
             android:layout_marginTop="12dp" />
 
         <TextView
-            android:id="@+id/healthStatusTextView"
+            android:id="@+id/profileMessageTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:gravity="center"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorError"
+            android:textSize="14sp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/userProfileCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="#FFFFFB"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="2dp"
+            app:cardUseCompatPadding="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/avatarTextView"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="#FFE2BA"
+                    android:gravity="center"
+                    android:text="LU"
+                    android:textAppearance="?attr/textAppearanceTitleLarge"
+                    android:textColor="#6B451E"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/displayNameTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Local User"
+                        android:textAppearance="?attr/textAppearanceTitleLarge"
+                        android:textColor="#2F241A"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/userIdTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="local-user"
+                        android:textAppearance="?attr/textAppearanceBodyLarge"
+                        android:textColor="#7B6651"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/profileSubtitleTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="Home cook on Crumb"
+                        android:textAppearance="?attr/textAppearanceTitleMedium"
+                        android:textColor="#4E3C2B"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <LinearLayout
+            android:id="@+id/statsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/myRecipesCountTextView"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="#FFF2DE"
+                android:gravity="center"
+                android:text="0\nRecipes"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#4E3C2B"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/savedRecipesCountTextView"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
+                android:layout_weight="1"
+                android:background="#EEF6E8"
+                android:gravity="center"
+                android:text="0\nSaved"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#315B22"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/myPostsCountTextView"
+                android:layout_width="0dp"
+                android:layout_height="72dp"
+                android:layout_marginStart="6dp"
+                android:layout_weight="1"
+                android:background="#F7E7FF"
+                android:gravity="center"
+                android:text="0\nPosts"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#4E315B"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/myRecipesTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="My Recipes"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="#2F241A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/myRecipesRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
+            android:nestedScrollingEnabled="false" />
+
+        <TextView
+            android:id="@+id/myRecipesEmptyTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="No recipes yet."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="#7B6651"
+            android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/healthRetryButton"
+            android:id="@+id/seeAllRecipesButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="12dp"
-            android:text="Retry" />
+            android:layout_height="48dp"
+            android:text="See all"
+            android:textSize="14sp" />
 
         <TextView
             android:id="@+id/savedRecipesTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="24dp"
             android:text="Saved Recipes"
-            android:textAppearance="?attr/textAppearanceTitleMedium" />
-
-        <ProgressBar
-            android:id="@+id/savedRecipesProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="12dp" />
-
-        <TextView
-            android:id="@+id/savedRecipesStatusTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:gravity="center"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/savedRecipesRetryButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="12dp"
-            android:text="Retry" />
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="#2F241A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/savedRecipesRecyclerView"
@@ -83,5 +208,140 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:nestedScrollingEnabled="false" />
+
+        <TextView
+            android:id="@+id/savedRecipesEmptyTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="No saved recipes yet."
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="#7B6651"
+            android:textSize="14sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/seeAllSavedButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="See all"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/dietaryPreferencesTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Dietary Preferences"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="#2F241A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/dietaryPreferencesChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:singleSelection="false" />
+
+        <TextView
+            android:id="@+id/avoidIngredientsTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="Ingredients to Avoid"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="#2F241A"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/avoidIngredientsChipGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:singleSelection="false" />
+
+        <LinearLayout
+            android:id="@+id/addAvoidIngredientContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/avoidIngredientInputLayout"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:hint="Ingredient">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/avoidIngredientEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords"
+                    android:maxLines="1"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addAvoidIngredientButton"
+                android:layout_width="wrap_content"
+                android:layout_height="56dp"
+                android:layout_marginStart="10dp"
+                android:text="Add"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/settingsTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="Settings"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="#2F241A"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/settingsRowTextView"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:text="Settings"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="#4E3C2B"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/aboutRowTextView"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:text="About Crumb"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="#4E3C2B"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/healthStatusTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="#7B6651"
+            android:textSize="12sp"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/healthRetryButton"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Refresh status"
+            android:textSize="14sp"
+            android:visibility="gone" />
     </LinearLayout>
 </ScrollView>

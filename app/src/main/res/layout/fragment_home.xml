@@ -1,106 +1,263 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFF8F0"
-    android:paddingStart="20dp"
-    android:paddingTop="18dp"
-    android:paddingEnd="20dp"
-    android:paddingBottom="0dp">
+    android:background="@color/crumb_background"
+    android:fillViewport="true">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/homeHeaderCard"
-        android:layout_width="0dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:cardBackgroundColor="#FFFFFB"
-        app:cardCornerRadius="22dp"
-        app:cardElevation="1dp"
-        app:contentPadding="18dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="#F1D8B8"
-        app:strokeWidth="1dp">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <!-- 1. Header -->
+        <TextView
+            android:id="@+id/titleTextView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:text="Good day, Local User"
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
+            android:textColor="#2F241A"
+            android:textSize="24sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/titleTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Community Kitchen"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
-                android:textColor="#2F241A"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toStartOf="@id/retryButton"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:id="@+id/homeSubtitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="What would you like to cook today?"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textColor="#6F5E4D"
+            android:textSize="16sp" />
 
-            <TextView
-                android:id="@+id/homeSubtitleTextView"
-                android:layout_width="0dp"
+        <!-- 2. Daily Recipe Suggestion Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/dailyRecipeCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/crumb_card_surface"
+            app:cardCornerRadius="28dp"
+            app:cardElevation="2dp"
+            app:strokeColor="#F1D8B8"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:lineSpacingExtra="2dp"
-                android:text="Share meals, ingredient ideas, and small kitchen wins."
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="#6F5E4D"
-                app:layout_constraintEnd_toStartOf="@id/retryButton"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/titleTextView" />
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/dailyRecipeSectionTitleTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#EEF6E8"
+                    android:paddingHorizontal="12dp"
+                    android:paddingVertical="4dp"
+                    android:text="DAILY SUGGESTION"
+                    android:textAllCaps="true"
+                    android:textColor="@color/crumb_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/dailyRecipeTitleTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                    android:textColor="#3A2A1C"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    tools:text="Creamy Tomato Pasta" />
+
+                <TextView
+                    android:id="@+id/dailyRecipeMetaTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:textColor="#7B6651"
+                    android:textSize="14sp"
+                    tools:text="25 min | 8 ingredients" />
+
+                <TextView
+                    android:id="@+id/dailyRecipeIngredientsTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:lineHeight="20sp"
+                    android:textColor="#4E3C2B"
+                    android:textSize="14sp"
+                    tools:text="Tomatoes, Garlic, Basil, Pasta, Olive Oil, Parmesan, Black Pepper, Cream" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/viewDailyRecipeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:paddingHorizontal="24dp"
+                    android:text="View Recipe"
+                    android:textAllCaps="false"
+                    android:textSize="15sp"
+                    app:cornerRadius="16dp" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 3. Ingredient Categories -->
+        <TextView
+            android:id="@+id/categoriesTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Ingredient Categories"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="#2F241A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <HorizontalScrollView
+            android:id="@+id/categoriesScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:clipToPadding="false"
+            android:scrollbars="none">
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/categoryChipGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:chipSpacingHorizontal="10dp"
+                app:singleLine="true" />
+        </HorizontalScrollView>
+
+        <!-- 4. Quick Actions -->
+        <TextView
+            android:id="@+id/quickActionsTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Quick Actions"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="#2F241A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <GridLayout
+            android:id="@+id/quickActionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:columnCount="2"
+            android:rowCount="2">
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/retryButton"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:minWidth="88dp"
-                android:text="Retry"
-                android:textColor="#386A20"
-                app:cornerRadius="18dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:strokeColor="#A7C58F" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+                android:id="@+id/searchRecipesButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#F2F4EE"
+                android:text="Search\nRecipes"
+                android:textColor="@color/crumb_primary"
+                android:textSize="14sp"
+                app:cornerRadius="20dp" />
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/addRecipeButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#FFF2EE"
+                android:text="Add\nRecipe"
+                android:textColor="@color/crumb_accent"
+                android:textSize="14sp"
+                app:cornerRadius="20dp" />
 
-    <TextView
-        android:id="@+id/statusTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="12dp"
-        android:gravity="center"
-        android:lineSpacingExtra="2dp"
-        android:textColor="#6F5E4D"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/homeHeaderCard" />
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/createPostButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#EEF2F6"
+                android:text="Create\nPost"
+                android:textColor="#2980B9"
+                android:textSize="14sp"
+                app:cornerRadius="20dp" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/postsRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:clipToPadding="false"
-        android:paddingTop="16dp"
-        android:paddingBottom="20dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/homeHeaderCard" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/savedRecipesButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_columnWeight="1"
+                android:layout_margin="4dp"
+                android:backgroundTint="#FCF7E6"
+                android:text="Saved\nRecipes"
+                android:textColor="#D4AC0D"
+                android:textSize="14sp"
+                app:cornerRadius="20dp" />
+        </GridLayout>
+
+        <!-- 5. Recent Community Posts -->
+        <TextView
+            android:id="@+id/recentPostsTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:text="Community Feed"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="#2F241A"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:indeterminateTint="@color/crumb_primary" />
+
+        <TextView
+            android:id="@+id/statusTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:lineSpacingExtra="2dp"
+            android:textColor="#6F5E4D"
+            android:textSize="14sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/retryButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="12dp"
+            android:text="Retry"
+            app:cornerRadius="12dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/postsRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="80dp" />
+
+    </LinearLayout>
+</ScrollView>

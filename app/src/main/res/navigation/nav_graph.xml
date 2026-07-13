@@ -10,6 +10,21 @@
         android:label="@string/nav_home" />
 
     <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.example.crumb.feature.search.SearchFragment"
+        android:label="@string/nav_search" />
+
+    <fragment
+        android:id="@+id/addFragment"
+        android:name="com.example.crumb.feature.add.AddFragment"
+        android:label="@string/nav_add" />
+
+    <fragment
+        android:id="@+id/savedFragment"
+        android:name="com.example.crumb.feature.saved.SavedFragment"
+        android:label="@string/nav_saved" />
+
+    <fragment
         android:id="@+id/createPostFragment"
         android:name="com.example.crumb.feature.create.CreatePostFragment"
         android:label="@string/nav_create" />

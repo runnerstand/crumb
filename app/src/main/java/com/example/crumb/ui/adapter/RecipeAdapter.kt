@@ -14,7 +14,9 @@ class RecipeAdapter(
     private val onSaveRecipe: (RecipeUiModel) -> Unit,
     private val onUnsaveRecipe: (RecipeUiModel) -> Unit,
     private val onEditRecipe: (RecipeUiModel) -> Unit,
-    private val onDeleteRecipe: (RecipeUiModel) -> Unit
+    private val onDeleteRecipe: (RecipeUiModel) -> Unit,
+    private val showOwnerActions: Boolean = true,
+    private val showSaveAction: Boolean = true
 ) : ListAdapter<RecipeUiModel, RecipeAdapter.RecipeViewHolder>(DiffCallback) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         val binding = ItemRecipeBinding.inflate(
@@ -41,8 +43,11 @@ class RecipeAdapter(
             recipeIngredientsTextView.text = recipe.ingredients
                 .take(4)
                 .joinToString(", ") { it.displayText() }
-            editButton.visibility = if (recipe.isOwnedByLocalUser) View.VISIBLE else View.GONE
-            deleteButton.visibility = if (recipe.isOwnedByLocalUser) View.VISIBLE else View.GONE
+            editButton.visibility =
+                if (showOwnerActions && recipe.isOwnedByLocalUser) View.VISIBLE else View.GONE
+            deleteButton.visibility =
+                if (showOwnerActions && recipe.isOwnedByLocalUser) View.VISIBLE else View.GONE
+            saveButton.visibility = if (showSaveAction) View.VISIBLE else View.GONE
             saveButton.text = if (recipe.isSaved) "Saved" else "Save"
 
             viewButton.setOnClickListener { onViewRecipe(recipe) }

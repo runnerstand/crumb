@@ -10,36 +10,58 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/savedRecipeTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/savedRecipeMetaTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:textAppearance="?attr/textAppearanceBodySmall" />
+            android:layout_marginTop="8dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="#7B6651" />
 
         <TextView
             android:id="@+id/savedRecipeIngredientsTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAppearance="?attr/textAppearanceBodyMedium" />
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="3dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="#4E3C2B" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/viewSavedRecipeButton"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="48dp"
-            android:layout_marginTop="8dp"
-            android:minWidth="72dp"
-            android:text="View" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/viewSavedRecipeButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:minWidth="72dp"
+                android:text="View"
+                android:textAppearance="?attr/textAppearanceButton"
+                android:textSize="15sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/unsaveRecipeButton"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:minWidth="88dp"
+                android:text="Unsave"
+                android:textAppearance="?attr/textAppearanceButton"
+                android:textSize="15sp" />
+        </LinearLayout>
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

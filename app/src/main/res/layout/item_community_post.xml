@@ -1,153 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="14dp"
-    app:cardBackgroundColor="#FFFFFB"
-    app:cardCornerRadius="22dp"
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="@color/crumb_card_surface"
+    app:cardCornerRadius="24dp"
     app:cardElevation="2dp"
-    app:cardUseCompatPadding="true"
-    app:strokeColor="#EBCFA8"
+    app:strokeColor="#F0E4D7"
     app:strokeWidth="1dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingStart="18dp"
-        android:paddingTop="16dp"
-        android:paddingEnd="18dp"
-        android:paddingBottom="14dp">
+        android:orientation="vertical">
 
+        <!-- Display Mode -->
         <LinearLayout
             android:id="@+id/displayContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="20dp">
 
             <TextView
                 android:id="@+id/postTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:lineSpacingExtra="1dp"
-                android:textAppearance="?attr/textAppearanceTitleLarge"
                 android:textColor="#2F241A"
-                android:textStyle="bold" />
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="Delicious Roast Chicken" />
 
             <TextView
                 android:id="@+id/postCreatorTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="#7B6651" />
+                android:layout_marginTop="2dp"
+                android:textColor="#7B6651"
+                android:textSize="14sp"
+                android:textStyle="italic"
+                tools:text="By Chef Maria" />
 
             <TextView
                 android:id="@+id/postIngredientsTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:background="#FFF2DE"
-                android:lineSpacingExtra="2dp"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="10dp"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="#4E3C2B" />
+                android:layout_marginTop="16dp"
+                android:background="#FCF7F0"
+                android:lineHeight="22sp"
+                android:padding="12dp"
+                android:textColor="#4E3C2B"
+                android:textSize="14sp"
+                tools:text="Ingredients: Chicken, Rosemary, Lemon, Garlic, Butter, Salt, Pepper" />
 
             <TextView
                 android:id="@+id/linkedRecipeTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="10dp"
                 android:background="#EEF6E8"
                 android:clickable="true"
                 android:focusable="true"
-                android:lineSpacingExtra="2dp"
-                android:paddingStart="12dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="10dp"
-                android:textAppearance="?attr/textAppearanceBodyMedium"
-                android:textColor="#315B22" />
+                android:lineHeight="20sp"
+                android:padding="12dp"
+                android:textColor="#315B22"
+                android:textSize="14sp"
+                tools:text="Recipe: Lemon Herb Chicken\nCreator: Chef Maria" />
 
             <TextView
                 android:id="@+id/postCaptionTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:lineSpacingExtra="3dp"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:textColor="#352A20" />
+                android:layout_marginTop="16dp"
+                android:lineHeight="24sp"
+                android:textColor="#352A20"
+                android:textSize="16sp"
+                tools:text="This is my favorite Sunday dinner! The chicken comes out so juicy and the skin is perfectly crispy." />
 
             <TextView
                 android:id="@+id/postDatesTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:textAppearance="?attr/textAppearanceBodySmall"
-                android:textColor="#8A7866" />
+                android:layout_marginTop="16dp"
+                android:textColor="#A09080"
+                android:textSize="12sp"
+                tools:text="Created 2 hours ago | Updated 1 hour ago" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="20dp"
+                android:background="#F0E4D7" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:showDividers="none">
+                android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/commentsButton"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:minWidth="96dp"
+                    android:layout_height="wrap_content"
                     android:text="Comments"
-                    android:textColor="#386A20"
-                    app:cornerRadius="18dp" />
+                    android:textAllCaps="false"
+                    android:textColor="@color/crumb_primary"
+                    android:textSize="14sp"
+                    app:cornerRadius="12dp" />
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/editButton"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:minWidth="72dp"
+                    android:layout_height="wrap_content"
                     android:text="Edit"
-                    android:textColor="#6B5E1F"
-                    app:cornerRadius="18dp" />
+                    android:textAllCaps="false"
+                    android:textColor="@color/crumb_secondary"
+                    android:textSize="14sp"
+                    app:cornerRadius="12dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/deleteButton"
                     style="@style/Widget.MaterialComponents.Button.TextButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:minWidth="80dp"
+                    android:layout_height="wrap_content"
                     android:text="Delete"
+                    android:textAllCaps="false"
                     android:textColor="#A13F2D"
-                    app:cornerRadius="18dp" />
+                    android:textSize="14sp"
+                    app:cornerRadius="12dp" />
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Edit Mode -->
         <LinearLayout
             android:id="@+id/editContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
+            android:padding="20dp"
             android:visibility="gone">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/editTitleInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Title"
-                app:boxCornerRadiusBottomEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxStrokeColor="#8AAE6C"
-                app:hintTextColor="#386A20">
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxStrokeColor="@color/crumb_primary"
+                app:hintTextColor="@color/crumb_primary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editTitleEditText"
@@ -159,16 +173,17 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/editIngredientsInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:hint="Ingredients"
-                app:boxCornerRadiusBottomEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxStrokeColor="#8AAE6C"
-                app:hintTextColor="#386A20">
+                android:hint="Ingredients (comma separated)"
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxStrokeColor="@color/crumb_primary"
+                app:hintTextColor="@color/crumb_primary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editIngredientsEditText"
@@ -181,16 +196,17 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/editCaptionInputLayout"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Caption"
-                app:boxCornerRadiusBottomEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxStrokeColor="#8AAE6C"
-                app:hintTextColor="#386A20">
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxStrokeColor="@color/crumb_primary"
+                app:hintTextColor="@color/crumb_primary">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/editCaptionEditText"
@@ -208,12 +224,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:hint="Linked recipe"
-                app:boxCornerRadiusBottomEnd="14dp"
-                app:boxCornerRadiusBottomStart="14dp"
-                app:boxCornerRadiusTopEnd="14dp"
-                app:boxCornerRadiusTopStart="14dp"
-                app:boxStrokeColor="#8AAE6C"
-                app:hintTextColor="#386A20">
+                app:boxCornerRadiusBottomEnd="16dp"
+                app:boxCornerRadiusBottomStart="16dp"
+                app:boxCornerRadiusTopEnd="16dp"
+                app:boxCornerRadiusTopStart="16dp"
+                app:boxStrokeColor="@color/crumb_primary"
+                app:hintTextColor="@color/crumb_primary">
 
                 <AutoCompleteTextView
                     android:id="@+id/editRecipeAutoCompleteTextView"
@@ -233,27 +249,29 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/saveButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:minWidth="96dp"
+                    android:layout_height="wrap_content"
+                    android:minWidth="100dp"
                     android:text="Save"
-                    app:cornerRadius="18dp" />
+                    android:textAllCaps="false"
+                    app:cornerRadius="14dp" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/cancelButton"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="48dp"
-                    android:layout_marginStart="10dp"
-                    android:minWidth="96dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:minWidth="100dp"
                     android:text="Cancel"
-                    app:cornerRadius="18dp" />
+                    android:textAllCaps="false"
+                    app:cornerRadius="14dp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

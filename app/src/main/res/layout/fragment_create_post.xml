@@ -15,7 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Create Post"
-            android:textAppearance="?attr/textAppearanceHeadlineSmall" />
+            android:textAppearance="?attr/textAppearanceHeadlineMedium"
+            android:textStyle="bold" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/titleInputLayout"
@@ -54,7 +55,7 @@
             android:layout_height="wrap_content"
             android:gravity="end"
             android:text="0/200"
-            android:textAppearance="?attr/textAppearanceBodySmall" />
+            android:textAppearance="?attr/textAppearanceBodyMedium" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/recipeInputLayout"
@@ -84,7 +85,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:gravity="center"
-            android:textAppearance="?attr/textAppearanceBodySmall" />
+            android:textAppearance="?attr/textAppearanceBodyMedium" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
@@ -102,7 +103,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Selected ingredients"
-                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+                    android:textAppearance="?attr/textAppearanceTitleLarge"
+                    android:textStyle="bold" />
 
                 <com.google.android.material.chip.ChipGroup
                     android:id="@+id/selectedChipGroup"

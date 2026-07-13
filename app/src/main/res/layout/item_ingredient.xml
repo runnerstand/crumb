@@ -10,19 +10,22 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="12dp">
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/ingredientNameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textAppearance="?attr/textAppearanceTitleMedium" />
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/ingredientCategoryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceBodySmall" />
+            android:layout_marginTop="6dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="#7B6651" />
     </LinearLayout>
+
 </com.google.android.material.card.MaterialCardView>

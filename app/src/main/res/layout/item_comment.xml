@@ -22,21 +22,25 @@
                 android:id="@+id/commentCreatorTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceTitleSmall" />
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/commentTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
+                android:lineSpacingExtra="3dp"
                 android:textAppearance="?attr/textAppearanceBodyLarge" />
 
             <TextView
                 android:id="@+id/commentDatesTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:textAppearance="?attr/textAppearanceBodySmall" />
+                android:layout_marginTop="10dp"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="#8A7866" />
+
 
             <LinearLayout
                 android:id="@+id/commentActionsContainer"

@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFF8F0"
-    android:paddingStart="20dp"
+    android:paddingStart="16dp"
     android:paddingTop="18dp"
-    android:paddingEnd="20dp">
+    android:paddingEnd="16dp">
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/recipesHeaderCard"
@@ -15,7 +15,7 @@
         app:cardBackgroundColor="#FFFFFB"
         app:cardCornerRadius="22dp"
         app:cardElevation="1dp"
-        app:contentPadding="18dp"
+        app:contentPadding="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,7 +31,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Recipes"
-                android:textAppearance="?attr/textAppearanceHeadlineSmall"
+                android:textAppearance="?attr/textAppearanceHeadlineMedium"
                 android:textColor="#2F241A"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toStartOf="@id/addRecipeButton"
@@ -42,9 +42,9 @@
                 android:id="@+id/subtitleTextView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="8dp"
                 android:text="Create and manage your own recipes."
-                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
                 android:textColor="#6F5E4D"
                 app:layout_constraintEnd_toStartOf="@id/addRecipeButton"
                 app:layout_constraintStart_toStartOf="parent"
@@ -53,15 +53,17 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/addRecipeButton"
                 android:layout_width="wrap_content"
-                android:layout_height="48dp"
-                android:minWidth="88dp"
+                android:layout_height="52dp"
+                android:minWidth="96dp"
                 android:text="New"
+                android:textSize="15sp"
                 app:cornerRadius="18dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
+
 
     <ProgressBar
         android:id="@+id/progressBar"

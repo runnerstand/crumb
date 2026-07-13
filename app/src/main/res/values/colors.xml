@@ -10,4 +10,7 @@
     <color name="crumb_primary">#386A20</color>
     <color name="crumb_primary_dark">#1F4D0C</color>
     <color name="crumb_secondary">#6B5E1F</color>
+    <color name="crumb_accent">#E67E22</color>
+    <color name="crumb_background">#FFFBF4</color>
+    <color name="crumb_card_surface">#FFFFFF</color>
 </resources>

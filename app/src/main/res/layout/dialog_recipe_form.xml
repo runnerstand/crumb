@@ -55,10 +55,11 @@
             android:id="@+id/selectedIngredientsTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:text="Recipe ingredients"
-            android:textAppearance="?attr/textAppearanceTitleMedium"
-            android:textColor="#2F241A" />
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:textColor="#2F241A"
+            android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/selectedIngredientsRecyclerView"
@@ -70,8 +71,8 @@
             android:id="@+id/catalogueStatusTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:layout_marginTop="12dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             android:textColor="#6F5E4D" />
 
         <androidx.recyclerview.widget.RecyclerView
@@ -84,8 +85,8 @@
             android:id="@+id/validationTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:layout_marginTop="14dp"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
             android:textColor="?attr/colorError" />
     </LinearLayout>
 </ScrollView>
