@@ -1,0 +1,273 @@
+[
+    {
+        "id": 1,
+        "title": "Tomato Egg Rice",
+        "ingredients": [
+            "egg",
+            "tomato",
+            "rice",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "2 eggs",
+            "150 grams tomato",
+            "200 grams rice",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Cut the tomatoes.",
+            "Cook the eggs in a pan.",
+            "Add the tomatoes and cook until soft.",
+            "Serve with rice."
+        ],
+        "cooking_time_minutes": 20
+    },
+    {
+        "id": 2,
+        "title": "Minced Pork with Eggplant",
+        "ingredients": [
+            "minced pork",
+            "eggplant",
+            "garlic",
+            "soy sauce",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "250 grams minced pork",
+            "1 medium eggplant",
+            "2 cloves garlic",
+            "1 tablespoon soy sauce",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Cut eggplant into pieces.",
+            "Stir fry garlic and minced pork until browned.",
+            "Add eggplant and soy sauce.",
+            "Stir and cook until eggplant is soft."
+        ],
+        "cooking_time_minutes": 25
+    },
+    {
+        "id": 3,
+        "title": "Beef Stir-fry with Broccoli",
+        "ingredients": [
+            "minced beef",
+            "broccoli",
+            "garlic",
+            "soy sauce",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "250 grams minced beef",
+            "200 grams broccoli",
+            "2 cloves garlic",
+            "1 tablespoon soy sauce",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Cut broccoli into small florets.",
+            "Stir fry minced beef in a pan until cooked.",
+            "Add broccoli, garlic, and soy sauce.",
+            "Cook until broccoli is tender."
+        ],
+        "cooking_time_minutes": 20
+    },
+    {
+        "id": 4,
+        "title": "Scrambled Eggs with Minced Pork",
+        "ingredients": [
+            "egg",
+            "minced pork",
+            "green onion",
+            "soy sauce",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "3 eggs",
+            "150 grams minced pork",
+            "1 green onion",
+            "1 tablespoon soy sauce",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Beat the eggs in a bowl.",
+            "Stir fry minced pork until cooked.",
+            "Pour eggs over the pork and scramble.",
+            "Garnish with green onions."
+        ],
+        "cooking_time_minutes": 15
+    },
+    {
+        "id": 5,
+        "title": "Garlic Spinach Stir-fry",
+        "ingredients": [
+            "spinach",
+            "garlic",
+            "salt",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "200 grams spinach",
+            "2 cloves garlic",
+            "to taste salt",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Wash spinach thoroughly.",
+            "Heat oil in a pan and saute minced garlic.",
+            "Add spinach and salt.",
+            "Stir-fry quickly until spinach wilts."
+        ],
+        "cooking_time_minutes": 10
+    },
+    {
+        "id": 6,
+        "title": "Lamb Kofta",
+        "ingredients": [
+            "minced lamb",
+            "onion",
+            "cumin",
+            "garlic",
+            "olive oil"
+        ],
+        "ingredient_measurements": [
+            "500 grams minced lamb",
+            "1 medium onion",
+            "1 teaspoon cumin",
+            "2 cloves garlic",
+            "1 tablespoon olive oil"
+        ],
+        "instructions": [
+            "Finely chop onion and garlic.",
+            "Mix minced lamb, onion, garlic, and cumin in a bowl.",
+            "Shape the mixture into small cylinders.",
+            "Grill or pan-fry until fully cooked."
+        ],
+        "cooking_time_minutes": 30
+    },
+    {
+        "id": 7,
+        "title": "Fried Rice with Mixed Vegetables",
+        "ingredients": [
+            "rice",
+            "egg",
+            "carrot",
+            "peas",
+            "soy sauce",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "250 grams rice",
+            "2 eggs",
+            "100 grams carrot",
+            "100 grams peas",
+            "1 tablespoon soy sauce",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Chop carrot into tiny pieces.",
+            "Scramble the eggs in a pan and set aside.",
+            "Stir-fry carrot, peas, and rice in the pan.",
+            "Mix in the egg and soy sauce, stir well."
+        ],
+        "cooking_time_minutes": 15
+    },
+    {
+        "id": 8,
+        "title": "Pork and Cabbage Stir-fry",
+        "ingredients": [
+            "minced pork",
+            "cabbage",
+            "soy sauce",
+            "garlic",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "250 grams minced pork",
+            "300 grams cabbage",
+            "1 tablespoon soy sauce",
+            "2 cloves garlic",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Shred the cabbage and chop garlic.",
+            "Stir fry garlic and minced pork until cooked.",
+            "Add cabbage and soy sauce.",
+            "Stir-fry until cabbage is cooked through."
+        ],
+        "cooking_time_minutes": 20
+    },
+    {
+        "id": 9,
+        "title": "Egg and Tomato Soup",
+        "ingredients": [
+            "egg",
+            "tomato",
+            "green onion",
+            "salt",
+            "water"
+        ],
+        "ingredient_measurements": [
+            "2 eggs",
+            "200 grams tomato",
+            "1 green onion",
+            "to taste salt",
+            "500 millilitres water"
+        ],
+        "instructions": [
+            "Cut tomatoes and beat eggs.",
+            "Boil water in a pot and add tomatoes.",
+            "Pour beaten eggs slowly into the boiling soup while stirring.",
+            "Season with salt and garnish with green onions."
+        ],
+        "cooking_time_minutes": 15
+    },
+    {
+        "id": 10,
+        "title": "Minced Beef Chili",
+        "ingredients": [
+            "minced beef",
+            "onion",
+            "tomato",
+            "chili powder",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "300 grams minced beef",
+            "1 medium onion",
+            "200 grams tomato",
+            "1 teaspoon chili powder",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Chop onion and tomato.",
+            "Stir fry onion and minced beef until brown.",
+            "Add tomatoes and chili powder.",
+            "Simmer on low heat for 15 minutes."
+        ],
+        "cooking_time_minutes": 25
+    },
+    {
+        "id": 11,
+        "title": "Stir-fry Cabbage with Garlic",
+        "ingredients": [
+            "cabbage",
+            "garlic",
+            "soy sauce",
+            "cooking oil"
+        ],
+        "ingredient_measurements": [
+            "300 grams cabbage",
+            "2 cloves garlic",
+            "1 tablespoon soy sauce",
+            "1 tablespoon cooking oil"
+        ],
+        "instructions": [
+            "Cut cabbage into bite-sized pieces.",
+            "Heat oil in a pan and saute garlic.",
+            "Add cabbage and soy sauce.",
+            "Stir-fry until cabbage is soft but still crisp."
+        ],
+        "cooking_time_minutes": 12
+    }
+]

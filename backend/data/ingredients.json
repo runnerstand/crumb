@@ -1,0 +1,192 @@
+[
+    {
+        "name": "broccoli",
+        "aliases": [],
+        "category": "vegetable",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "cabbage",
+        "aliases": [],
+        "category": "vegetable",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "carrot",
+        "aliases": [],
+        "category": "vegetable",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "chili powder",
+        "aliases": [],
+        "category": "spice",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "cooking oil",
+        "aliases": [
+            "oil"
+        ],
+        "category": "oil",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "cumin",
+        "aliases": [],
+        "category": "spice",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "egg",
+        "aliases": [
+            "eggs"
+        ],
+        "category": "protein",
+        "warning_tags": [
+            "eggs"
+        ],
+        "needs_review": false
+    },
+    {
+        "name": "eggplant",
+        "aliases": [
+            "aubergine"
+        ],
+        "category": "vegetable",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "garlic",
+        "aliases": [],
+        "category": "aromatic",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "green onion",
+        "aliases": [
+            "scallion",
+            "spring onion"
+        ],
+        "category": "aromatic",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "minced beef",
+        "aliases": [
+            "ground beef"
+        ],
+        "category": "protein",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "minced lamb",
+        "aliases": [
+            "ground lamb"
+        ],
+        "category": "protein",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "minced pork",
+        "aliases": [
+            "ground pork"
+        ],
+        "category": "protein",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "olive oil",
+        "aliases": [],
+        "category": "oil",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "onion",
+        "aliases": [],
+        "category": "aromatic",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "peas",
+        "aliases": [
+            "green peas"
+        ],
+        "category": "vegetable",
+        "warning_tags": [
+            "legumes"
+        ],
+        "needs_review": false
+    },
+    {
+        "name": "rice",
+        "aliases": [],
+        "category": "grain",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "salt",
+        "aliases": [],
+        "category": "seasoning",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "soy sauce",
+        "aliases": [
+            "soya sauce"
+        ],
+        "category": "seasoning",
+        "warning_tags": [
+            "soy"
+        ],
+        "needs_review": false
+    },
+    {
+        "name": "spinach",
+        "aliases": [],
+        "category": "vegetable",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "tomato",
+        "aliases": [
+            "tomatoes"
+        ],
+        "category": "vegetable",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "water",
+        "aliases": [],
+        "category": "liquid",
+        "warning_tags": [],
+        "needs_review": false
+    },
+    {
+        "name": "zucchini",
+        "aliases": [
+            "courgette"
+        ],
+        "category": "vegetable",
+        "warning_tags": [],
+        "needs_review": false
+    }
+]

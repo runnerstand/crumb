@@ -1,0 +1,54 @@
+[
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\item_ingredient_category_header.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\item_ingredient_category_header.xml"
+    },
+    {
+        "merged": "com.example.crumb.app-mergeReleaseResources-47:/layout/dialog_recipe_form.xml",
+        "source": "com.example.crumb.app-main-49:/layout/dialog_recipe_form.xml"
+    },
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\fragment_search.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\fragment_search.xml"
+    },
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\fragment_profile.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\fragment_profile.xml"
+    },
+    {
+        "merged": "com.example.crumb.app-mergeReleaseResources-47:/layout/fragment_add.xml",
+        "source": "com.example.crumb.app-main-49:/layout/fragment_add.xml"
+    },
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\fragment_add.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\fragment_add.xml"
+    },
+    {
+        "merged": "com.example.crumb.app-mergeReleaseResources-47:/layout/fragment_search.xml",
+        "source": "com.example.crumb.app-main-49:/layout/fragment_search.xml"
+    },
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\activity_main.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\activity_main.xml"
+    },
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\fragment_saved.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\fragment_saved.xml"
+    },
+    {
+        "merged": "com.example.crumb.app-mergeReleaseResources-47:/layout/item_selected_recipe_ingredient.xml",
+        "source": "com.example.crumb.app-main-49:/layout/item_selected_recipe_ingredient.xml"
+    },
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\fragment_home.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\fragment_home.xml"
+    },
+    {
+        "merged": "com.example.crumb.app-mergeReleaseResources-47:/layout/item_recipe.xml",
+        "source": "com.example.crumb.app-main-49:/layout/item_recipe.xml"
+    },
+    {
+        "merged": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-mergeReleaseResources-47:\\layout\\item_ingredient.xml",
+        "source": "C:\\Users\\SwatD\\.gradle\\daemon\\9.4.1\\com.example.crumb.app-main-49:\\layout\\item_ingredient.xml"
+    }
+]

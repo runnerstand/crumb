@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Base.Theme.Crumb" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+    </style>
+    <style name="Theme.Crumb" parent="Base.Theme.Crumb"/>
+</resources>

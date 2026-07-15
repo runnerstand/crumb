@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 9.2.1" type="partial_results">
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="com.example.crumb.MainActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+    <map id="UnusedResources">
+        <location id="R.color.black"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="3"
+            column="12"
+            startOffset="62"
+            endLine="3"
+            endColumn="24"
+            endOffset="74"/>
+        <location id="R.color.white"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/colors.xml"
+            line="4"
+            column="12"
+            startOffset="104"
+            endLine="4"
+            endColumn="24"
+            endOffset="116"/>
+        <location id="R.string.add_subtitle"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="8"
+            column="13"
+            startOffset="334"
+            endLine="8"
+            endColumn="32"
+            endOffset="353"/>
+        <location id="R.string.recipe_deleted"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="45"
+            column="13"
+            startOffset="2575"
+            endLine="45"
+            endColumn="34"
+            endOffset="2596"/>
+        <location id="R.string.recipe_details_title"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="49"
+            column="13"
+            startOffset="2900"
+            endLine="49"
+            endColumn="40"
+            endOffset="2927"/>
+        <location id="R.string.recipe_saved"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="44"
+            column="13"
+            startOffset="2520"
+            endLine="44"
+            endColumn="32"
+            endOffset="2539"/>
+        <location id="R.string.search_subtitle"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="6"
+            column="13"
+            startOffset="228"
+            endLine="6"
+            endColumn="35"
+            endOffset="250"/>
+        <entry
+            name="model"
+            string="attr[colorSurface(R),textAppearanceHeadlineSmall(R),textAppearanceTitleMedium(R),textAppearanceBodyMedium(R),textAppearanceHeadlineLarge(R),textAppearanceBodyLarge(R),textAppearanceTitleLarge(R),selectableItemBackground(R),textAppearanceTitleSmall(R)],color[black(D),white(D)],drawable[ic_add(U),ic_home(U),ic_profile(U),ic_saved(U),ic_search(U)],id[main(U),nav_host_fragment(U),bottom_navigation(U),form_title(D),recipe_title_edit_text(D),cooking_time_edit_text(D),instructions_edit_text(D),ingredient_search_edit_text(D),ingredient_status_text(D),ingredient_retry_button(D),ingredient_recycler_view(D),selected_empty_text(D),selected_ingredient_recycler_view(D),form_error_text(D),cancel_button(D),save_button(D),create_recipe_button(D),create_community_post_button(D),selected_ingredients_label(D),selected_ingredients_chip_group(D),selected_ingredients_empty(D),loading_text(D),empty_text(D),retry_button(D),backend_status_label(D),backend_status_value(D),recipe_status_text(D),retry_recipes_button(D),recipe_recycler_view(D),ingredient_name(D),category_name(D),recipe_title(D),recipe_cooking_time(D),recipe_ingredients(D),view_recipe_button(D),edit_recipe_button(D),delete_recipe_button(D),selected_ingredient_name(D),quantity_edit_text(D),unit_edit_text(D),remove_ingredient_button(D),homeFragment(U),searchFragment(U),addFragment(U),savedFragment(U),profileFragment(U),nav_graph(D)],layout[activity_main(U),dialog_recipe_form(U),item_ingredient(U),item_selected_recipe_ingredient(U),fragment_add(U),fragment_home(U),fragment_profile(U),fragment_saved(U),fragment_search(U),item_recipe(U),item_ingredient_category_header(U)],menu[bottom_navigation_menu(U)],navigation[nav_graph(U)],string[app_name(U),create_recipe(U),recipe_title(U),cooking_time_minutes(U),instructions_hint(U),select_ingredients(U),search_ingredients_hint(U),ingredients_loading(U),retry(U),selected_ingredients_title(U),selected_ingredients_empty(U),cancel(U),save(U),choose_ingredients_title(U),create_community_post_later(U),ingredients_empty(U),home_title(U),home_subtitle(U),profile_title(U),profile_subtitle(U),backend_status_title(U),backend_status_checking(U),saved_title(U),saved_subtitle(U),user_recipes_title(U),recipes_loading(U),view(U),edit(U),delete(U),quantity(U),unit(U),remove(U),search_title(U),add_title(U),search_subtitle(D),add_subtitle(D),backend_status_connected(U),backend_status_disconnected(U),ingredients_no_matches(U),ingredients_error(U),recipes_empty(U),recipes_error(U),recipe_saved(D),recipe_deleted(D),delete_recipe_title(U),delete_recipe_message(U),recipe_form_error(U),recipe_details_title(D)],style[Theme_Crumb(U),Base_Theme_Crumb(U),Theme_Material3_DayNight_NoActionBar(R)];3f^12^4b^0^4a,40^7c^4d^1^4e^4f^50^51^2^52^53^3^54^41^55^56^42^57^58,41^7^5^7c,42^7c^8^69^6a^6b,43^7c^59^4^4d^5a^52^55^2^56^3^53^5^5b^54^41,44^5c^4^5d^5,45^5e^4^5f^5^60^6^61^54,46^62^4^63^5,47^7c^64^4^65^5^54^48,48^7c^2^3^66^67^68,49^2^7c,4a^c^5c^f^6c^b^6d^e^62^d^5e,4b^39^5c^44^6c^47^6d^43^62^46^5e^45,7c^7d,7d^7e;;;"/>
+    </map>
+
+</incidents>

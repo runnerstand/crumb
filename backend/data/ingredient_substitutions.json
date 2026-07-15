@@ -1,0 +1,74 @@
+[
+    {
+        "original_ingredient": "egg",
+        "alternative_ingredient": "tofu",
+        "alternative_measurement": "100 grams tofu",
+        "note": "Use firm tofu for a scramble-style texture.",
+        "warning_tags": [
+            "soy"
+        ],
+        "dietary_tags": [
+            "egg-free",
+            "vegetarian"
+        ]
+    },
+    {
+        "original_ingredient": "egg",
+        "alternative_ingredient": "chickpea flour batter",
+        "alternative_measurement": "60 grams chickpea flour batter",
+        "note": "Mix with water for binding or a simple omelet-style base.",
+        "warning_tags": [
+            "legumes"
+        ],
+        "dietary_tags": [
+            "egg-free",
+            "vegan"
+        ]
+    },
+    {
+        "original_ingredient": "soy sauce",
+        "alternative_ingredient": "salt",
+        "alternative_measurement": "1 teaspoon salt",
+        "note": "Use a smaller amount and adjust to taste.",
+        "warning_tags": [],
+        "dietary_tags": [
+            "soy-free"
+        ]
+    },
+    {
+        "original_ingredient": "soy sauce",
+        "alternative_ingredient": "coconut aminos",
+        "alternative_measurement": "1 tablespoon coconut aminos",
+        "note": "Use as a one-to-one swap for a sweeter soy-free seasoning.",
+        "warning_tags": [],
+        "dietary_tags": [
+            "soy-free"
+        ]
+    },
+    {
+        "original_ingredient": "peas",
+        "alternative_ingredient": "zucchini",
+        "alternative_measurement": "100 grams zucchini",
+        "note": "Dice small and add near the end of cooking.",
+        "warning_tags": [],
+        "dietary_tags": [
+            "legume-free"
+        ]
+    },
+    {
+        "original_ingredient": "cooking oil",
+        "alternative_ingredient": "olive oil",
+        "alternative_measurement": "1 tablespoon olive oil",
+        "note": "Use the same amount for sauteing.",
+        "warning_tags": [],
+        "dietary_tags": []
+    },
+    {
+        "original_ingredient": "tomato",
+        "alternative_ingredient": "zucchini",
+        "alternative_measurement": "150 grams zucchini",
+        "note": "Use when you want a mild vegetable swap, though it will reduce acidity.",
+        "warning_tags": [],
+        "dietary_tags": []
+    }
+]
