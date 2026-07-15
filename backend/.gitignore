@@ -1,6 +1,27 @@
+﻿# Python / FastAPI backend
 .venv/
-.pytest_cache/
+venv/
 __pycache__/
-*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Database / local data
 *.db
+*.sqlite
+*.sqlite3
 chroma_db/
+
+# Logs / temp
+*.log
+logs/
+tmp/
+temp/

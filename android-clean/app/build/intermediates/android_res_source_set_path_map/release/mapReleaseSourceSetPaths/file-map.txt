@@ -1,8 +1,0 @@
-com.example.crumb.app-pngs-0 D:\Projects\Crumb\android-clean\app\build\generated\res\pngs\release
-com.example.crumb.app-updated_navigation_xml-1 D:\Projects\Crumb\android-clean\app\build\generated\updated_navigation_xml\release
-com.example.crumb.app-packageReleaseResources-2 D:\Projects\Crumb\android-clean\app\build\intermediates\incremental\release\packageReleaseResources\merged.dir
-com.example.crumb.app-packageReleaseResources-3 D:\Projects\Crumb\android-clean\app\build\intermediates\incremental\release\packageReleaseResources\stripped.dir
-com.example.crumb.app-release-4 D:\Projects\Crumb\android-clean\app\build\intermediates\merged_res\release\mergeReleaseResources
-com.example.crumb.app-main-5 D:\Projects\Crumb\android-clean\app\src\main\res
-com.example.crumb.app-release-6 D:\Projects\Crumb\android-clean\app\src\release\res
-gradleHome-0 C:\Users\SwatD\.gradle
