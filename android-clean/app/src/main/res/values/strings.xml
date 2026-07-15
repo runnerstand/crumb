@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">Crumb</string>
+    <string name="home_title">Home</string>
+    <string name="home_subtitle">Your Crumb starting point.</string>
+    <string name="search_title">Search</string>
+    <string name="search_subtitle">Find what you need.</string>
+    <string name="add_title">Add</string>
+    <string name="add_subtitle">Create something new.</string>
+    <string name="saved_title">Saved</string>
+    <string name="saved_subtitle">Return to saved items.</string>
+    <string name="profile_title">Profile</string>
+    <string name="profile_subtitle">Manage your Crumb profile.</string>
+</resources>
