@@ -126,8 +126,6 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <!-- DIETARY PREFERENCES -->
-        <!-- Static prototype tags -->
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -138,27 +136,53 @@
             android:textStyle="bold" />
 
         <com.google.android.material.chip.ChipGroup
+            android:id="@+id/dietary_preferences_chip_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_small"
             app:singleLine="false">
 
             <com.google.android.material.chip.Chip
-                style="@style/Widget.Material3.Chip.Suggestion"
+                android:id="@+id/dietary_vegetarian_chip"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/profile_dietary_vegan"
-                app:chipIconTint="@color/accent_green" />
+                android:checkable="true"
+                android:text="@string/profile_dietary_vegetarian" />
 
             <com.google.android.material.chip.Chip
-                style="@style/Widget.Material3.Chip.Suggestion"
+                android:id="@+id/dietary_vegan_chip"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="@string/profile_dietary_vegan" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dietary_halal_chip"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="@string/profile_dietary_halal" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dietary_gluten_free_chip"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
                 android:text="@string/profile_dietary_gluten_free" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/dietary_dairy_free_chip"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="@string/profile_dietary_dairy_free" />
         </com.google.android.material.chip.ChipGroup>
 
-        <!-- AVOID INGREDIENTS -->
-        <!-- Static prototype tags -->
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -169,23 +193,79 @@
             android:textStyle="bold" />
 
         <com.google.android.material.chip.ChipGroup
+            android:id="@+id/avoid_ingredients_chip_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_small"
             app:singleLine="false">
 
             <com.google.android.material.chip.Chip
-                style="@style/Widget.Material3.Chip.Suggestion"
+                android:id="@+id/avoid_peanuts_chip"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
                 android:text="@string/profile_avoid_peanuts" />
 
             <com.google.android.material.chip.Chip
-                style="@style/Widget.Material3.Chip.Suggestion"
+                android:id="@+id/avoid_tree_nuts_chip"
+                style="@style/Widget.Material3.Chip.Filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="@string/profile_avoid_tree_nuts" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/avoid_shellfish_chip"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
                 android:text="@string/profile_avoid_shellfish" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/avoid_milk_chip"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="@string/profile_avoid_milk" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/avoid_eggs_chip"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="@string/profile_avoid_eggs" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/avoid_soy_chip"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checkable="true"
+                android:text="@string/profile_avoid_soy" />
         </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/save_preferences_button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:text="@string/save_preferences"
+            app:cornerRadius="@dimen/button_radius" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/preferences_status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:textColor="@color/accent_green"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="@string/preferences_saved"
+            tools:visibility="visible" />
 
         <!-- BACKEND STATUS CARD -->
         <com.google.android.material.card.MaterialCardView

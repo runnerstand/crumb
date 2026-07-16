@@ -7,6 +7,7 @@ import com.example.crumb.data.CommunityPostResponse
 import com.example.crumb.databinding.ItemCommunityPostBinding
 
 class CommunityPostAdapter(
+    private val onCommentsClick: (CommunityPostResponse) -> Unit,
     private val onEditClick: (CommunityPostResponse) -> Unit,
     private val onDeleteClick: (CommunityPostResponse) -> Unit
 ) : RecyclerView.Adapter<CommunityPostAdapter.ViewHolder>() {
@@ -15,6 +16,7 @@ class CommunityPostAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(
             ItemCommunityPostBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onCommentsClick,
             onEditClick,
             onDeleteClick
         )
@@ -34,6 +36,7 @@ class CommunityPostAdapter(
 
     class ViewHolder(
         private val binding: ItemCommunityPostBinding,
+        private val onCommentsClick: (CommunityPostResponse) -> Unit,
         private val onEditClick: (CommunityPostResponse) -> Unit,
         private val onDeleteClick: (CommunityPostResponse) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -44,6 +47,7 @@ class CommunityPostAdapter(
                 .joinToString(", ")
                 .ifBlank { "No ingredients" }
             binding.postCaption.text = post.caption
+            binding.commentsButton.setOnClickListener { onCommentsClick(post) }
             binding.editPostButton.setOnClickListener { onEditClick(post) }
             binding.deletePostButton.setOnClickListener { onDeleteClick(post) }
         }

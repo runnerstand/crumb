@@ -29,6 +29,28 @@ interface ApiService {
     @DELETE("community/posts/{post_id}")
     suspend fun deleteCommunityPost(@Path("post_id") postId: Int): Map<String, String>
 
+    @GET("community/posts/{post_id}/comments")
+    suspend fun getCommunityComments(
+        @Path("post_id") postId: Int
+    ): List<CommunityCommentResponse>
+
+    @POST("community/posts/{post_id}/comments")
+    suspend fun createCommunityComment(
+        @Path("post_id") postId: Int,
+        @Body request: CommunityCommentRequest
+    ): CommunityCommentResponse
+
+    @PATCH("community/comments/{comment_id}")
+    suspend fun updateCommunityComment(
+        @Path("comment_id") commentId: Int,
+        @Body request: CommunityCommentRequest
+    ): CommunityCommentResponse
+
+    @DELETE("community/comments/{comment_id}")
+    suspend fun deleteCommunityComment(
+        @Path("comment_id") commentId: Int
+    ): Map<String, String>
+
     @GET("recipes/user-created")
     suspend fun getUserRecipes(): List<RecipeResponse>
 

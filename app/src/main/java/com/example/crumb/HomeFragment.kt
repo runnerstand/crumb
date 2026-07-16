@@ -27,6 +27,7 @@ class HomeFragment : Fragment() {
     private val recipeRepository = RecipeRepository()
     private val postRepository = CommunityPostRepository()
     private val postAdapter = CommunityPostAdapter(
+        onCommentsClick = ::showComments,
         onEditClick = ::editPost,
         onDeleteClick = ::confirmDeletePost
     )
@@ -215,6 +216,11 @@ class HomeFragment : Fragment() {
     private fun editPost(post: CommunityPostResponse) {
         CommunityPostFormDialogFragment.newInstance(post)
             .show(parentFragmentManager, "CommunityPostFormDialog")
+    }
+
+    private fun showComments(post: CommunityPostResponse) {
+        CommunityCommentsDialogFragment.newInstance(post.id, post.title)
+            .show(parentFragmentManager, "CommunityCommentsDialog")
     }
 
     private fun confirmDeletePost(post: CommunityPostResponse) {
