@@ -1,6 +1,7 @@
 package com.example.crumb
 
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -50,6 +51,8 @@ class RecipeFormDialogFragment : DialogFragment() {
         } else {
             getString(R.string.edit)
         }
+        binding.recipeTitleEditText.filters = arrayOf(InputFilter.LengthFilter(MAX_TITLE_LENGTH))
+        binding.instructionsEditText.filters = arrayOf(InputFilter.LengthFilter(MAX_INSTRUCTIONS_LENGTH))
         binding.ingredientRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.ingredientRecyclerView.adapter = ingredientAdapter
         binding.selectedIngredientRecyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -84,6 +87,8 @@ class RecipeFormDialogFragment : DialogFragment() {
         binding.ingredientStatusText.text = getString(R.string.ingredients_loading)
         binding.ingredientStatusText.visibility = View.VISIBLE
         binding.ingredientRetryButton.visibility = View.GONE
+        binding.ingredientRetryButton.isEnabled = false
+        binding.ingredientRecyclerView.visibility = View.GONE
 
         viewLifecycleOwner.lifecycleScope.launch {
             val result = ingredientRepository.getIngredientCategories()
@@ -97,8 +102,10 @@ class RecipeFormDialogFragment : DialogFragment() {
                 },
                 onFailure = { error ->
                     binding.ingredientStatusText.text = error.message?.takeIf { it.isNotBlank() }
-                        ?: getString(R.string.ingredients_error)
+                        ?: getString(R.string.generic_error)
                     binding.ingredientRetryButton.visibility = View.VISIBLE
+                    binding.ingredientRetryButton.isEnabled = true
+                    binding.ingredientRecyclerView.visibility = View.GONE
                 }
             )
         }
@@ -116,7 +123,7 @@ class RecipeFormDialogFragment : DialogFragment() {
                     setSavingState(false)
                 },
                 onFailure = { error ->
-                    showFormError(error.message ?: getString(R.string.recipes_error))
+                    showFormError(error.message ?: getString(R.string.generic_error))
                     setSavingState(false)
                 }
             )
@@ -142,11 +149,14 @@ class RecipeFormDialogFragment : DialogFragment() {
     private fun updateIngredientList() {
         val query = binding.ingredientSearchEditText.text?.toString().orEmpty()
         ingredientAdapter.submitIngredients(allIngredients, query)
-        binding.ingredientStatusText.visibility =
-            if (ingredientAdapter.itemCount == 0) View.VISIBLE else View.GONE
-        if (ingredientAdapter.itemCount == 0 && allIngredients.isNotEmpty()) {
-            binding.ingredientStatusText.text = getString(R.string.ingredients_no_matches)
+        val hasMatches = ingredientAdapter.itemCount > 0
+        binding.ingredientRecyclerView.visibility = if (hasMatches) View.VISIBLE else View.GONE
+        binding.ingredientStatusText.visibility = if (hasMatches) View.GONE else View.VISIBLE
+        binding.ingredientStatusText.text = when {
+            allIngredients.isEmpty() -> getString(R.string.ingredients_empty)
+            else -> getString(R.string.ingredients_no_matches)
         }
+        binding.ingredientRetryButton.visibility = View.GONE
     }
 
     private fun selectIngredient(ingredient: IngredientResponse) {
@@ -169,8 +179,12 @@ class RecipeFormDialogFragment : DialogFragment() {
     }
 
     private fun saveRecipe() {
+        if (!binding.saveButton.isEnabled) {
+            return
+        }
+
+        binding.formErrorText.visibility = View.GONE
         val request = buildRecipeRequest() ?: run {
-            showFormError(getString(R.string.recipe_form_error))
             return
         }
 
@@ -187,7 +201,7 @@ class RecipeFormDialogFragment : DialogFragment() {
                     dismiss()
                 },
                 onFailure = { error ->
-                    showFormError(error.message ?: getString(R.string.recipes_error))
+                    showFormError(error.message ?: getString(R.string.generic_error))
                     setSavingState(false)
                 }
             )
@@ -202,8 +216,8 @@ class RecipeFormDialogFragment : DialogFragment() {
             ?.filter { it.isNotBlank() }
             .orEmpty()
         val cookingTime = binding.cookingTimeEditText.text?.toString()?.trim()
-            ?.takeIf { it.isNotBlank() }
-            ?.toIntOrNull()
+            .orEmpty()
+        val parsedCookingTime = cookingTime.takeIf { it.isNotBlank() }?.toIntOrNull()
         val ingredients = selectedIngredients.values.map {
             RecipeIngredientRequest(
                 ingredientName = it.name,
@@ -212,15 +226,52 @@ class RecipeFormDialogFragment : DialogFragment() {
             )
         }
 
-        if (title.isBlank() || instructions.isEmpty() || ingredients.isEmpty()) {
+        if (title.isBlank()) {
+            showFormError(getString(R.string.recipe_title_required))
             return null
+        }
+        if (title.length > MAX_TITLE_LENGTH) {
+            showFormError(getString(R.string.recipe_title_too_long))
+            return null
+        }
+        if (cookingTime.isNotBlank() && (parsedCookingTime == null || parsedCookingTime <= 0)) {
+            showFormError(getString(R.string.recipe_cooking_time_invalid))
+            return null
+        }
+        if (instructions.isEmpty()) {
+            showFormError(getString(R.string.recipe_instructions_required))
+            return null
+        }
+        if (instructions.any { it.length > MAX_INSTRUCTION_LINE_LENGTH }) {
+            showFormError(getString(R.string.recipe_instructions_too_long))
+            return null
+        }
+        if (ingredients.isEmpty()) {
+            showFormError(getString(R.string.recipe_ingredients_required))
+            return null
+        }
+        selectedIngredients.values.forEach { ingredient ->
+            val quantity = ingredient.quantity.trim()
+            val unit = ingredient.unit.trim()
+            if (quantity.isBlank()) {
+                showFormError(getString(R.string.recipe_quantity_required))
+                return null
+            }
+            if (!quantity.isPositiveQuantity()) {
+                showFormError(getString(R.string.recipe_quantity_invalid))
+                return null
+            }
+            if (unit.isBlank()) {
+                showFormError(getString(R.string.recipe_unit_required))
+                return null
+            }
         }
 
         return RecipeRequest(
             title = title,
             ingredients = ingredients,
             instructions = instructions,
-            cookingTimeMinutes = cookingTime
+            cookingTimeMinutes = parsedCookingTime
         )
     }
 
@@ -243,6 +294,9 @@ class RecipeFormDialogFragment : DialogFragment() {
         const val REQUEST_KEY = "recipe_changed"
         const val RESULT_CHANGED = "changed"
         private const val ARG_RECIPE_ID = "recipe_id"
+        private const val MAX_TITLE_LENGTH = 120
+        private const val MAX_INSTRUCTIONS_LENGTH = 4000
+        private const val MAX_INSTRUCTION_LINE_LENGTH = 1000
 
         fun newInstance(recipeId: Int? = null): RecipeFormDialogFragment {
             return RecipeFormDialogFragment().apply {
@@ -250,4 +304,20 @@ class RecipeFormDialogFragment : DialogFragment() {
             }
         }
     }
+}
+
+private fun String.isPositiveQuantity(): Boolean {
+    val decimalValue = toDoubleOrNull()
+    if (decimalValue != null) {
+        return decimalValue > 0
+    }
+
+    val parts = split("/")
+    if (parts.size != 2) {
+        return false
+    }
+
+    val numerator = parts[0].trim().toDoubleOrNull() ?: return false
+    val denominator = parts[1].trim().toDoubleOrNull() ?: return false
+    return numerator > 0 && denominator > 0
 }

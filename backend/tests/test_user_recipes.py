@@ -170,3 +170,100 @@ def test_create_user_recipe_rejects_unsupported_ingredient(client: TestClient) -
 
     assert response.status_code == 400
     assert response.json() == {"detail": "Unsupported ingredient: dragonfruit"}
+
+
+def test_create_user_recipe_rejects_blank_title(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["title"] = "   "
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_create_user_recipe_rejects_missing_title(client: TestClient) -> None:
+    payload = recipe_payload()
+    del payload["title"]
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_create_user_recipe_rejects_empty_instructions(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["instructions"] = []
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_create_user_recipe_rejects_blank_instruction_step(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["instructions"] = ["Cook eggs.", "   "]
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_create_user_recipe_rejects_invalid_cooking_time(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["cooking_time_minutes"] = 0
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_create_user_recipe_rejects_no_ingredients(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["ingredients"] = []
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_create_user_recipe_rejects_blank_ingredient_name(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["ingredients"] = [{"ingredient_name": "   ", "quantity": "1", "unit": "cup"}]
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_create_user_recipe_rejects_duplicate_ingredients(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["ingredients"] = [
+        {"ingredient_name": "egg", "quantity": "1", "unit": "piece"},
+        {"ingredient_name": "eggs", "quantity": "2", "unit": "pieces"},
+    ]
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Duplicate ingredient: egg"}
+
+
+def test_read_missing_user_recipe_returns_404(client: TestClient) -> None:
+    response = client.get("/recipes/user-created/999")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Recipe not found."}
+
+
+def test_update_missing_user_recipe_returns_404(client: TestClient) -> None:
+    response = client.patch("/recipes/user-created/999", json=recipe_payload())
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Recipe not found."}
+
+
+def test_delete_missing_user_recipe_returns_404(client: TestClient) -> None:
+    response = client.delete("/recipes/user-created/999")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Recipe not found."}

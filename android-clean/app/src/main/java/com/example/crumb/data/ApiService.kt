@@ -14,6 +14,21 @@ interface ApiService {
     @GET("ingredients/categories")
     suspend fun getIngredientCategories(): List<IngredientResponse>
 
+    @GET("community/posts")
+    suspend fun getCommunityPosts(): List<CommunityPostResponse>
+
+    @POST("community/posts")
+    suspend fun createCommunityPost(@Body request: CommunityPostRequest): CommunityPostResponse
+
+    @PATCH("community/posts/{post_id}")
+    suspend fun updateCommunityPost(
+        @Path("post_id") postId: Int,
+        @Body request: CommunityPostRequest
+    ): CommunityPostResponse
+
+    @DELETE("community/posts/{post_id}")
+    suspend fun deleteCommunityPost(@Path("post_id") postId: Int): Map<String, String>
+
     @GET("recipes/user-created")
     suspend fun getUserRecipes(): List<RecipeResponse>
 

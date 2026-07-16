@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.crumb.data.RecipeRepository
 import com.example.crumb.data.RecipeResponse
 import com.example.crumb.databinding.FragmentSearchBinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class SearchFragment : Fragment() {
@@ -23,6 +24,8 @@ class SearchFragment : Fragment() {
         onEditClick = ::editRecipe,
         onDeleteClick = ::confirmDeleteRecipe
     )
+    private var loadRecipesJob: Job? = null
+    private var deleteJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentSearchBinding.inflate(inflater, container, false)
@@ -45,14 +48,12 @@ class SearchFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        if (_binding != null) {
-            loadRecipes()
-        }
     }
 
     private fun loadRecipes() {
+        loadRecipesJob?.cancel()
         showLoading()
-        viewLifecycleOwner.lifecycleScope.launch {
+        loadRecipesJob = viewLifecycleOwner.lifecycleScope.launch {
             val result = recipeRepository.getUserRecipes()
             if (_binding == null) return@launch
 
@@ -62,6 +63,7 @@ class SearchFragment : Fragment() {
                     binding.recipeRecyclerView.visibility =
                         if (recipes.isEmpty()) View.GONE else View.VISIBLE
                     binding.retryRecipesButton.visibility = View.GONE
+                    binding.retryRecipesButton.isEnabled = true
                     binding.recipeStatusText.visibility = View.VISIBLE
                     binding.recipeStatusText.text = if (recipes.isEmpty()) {
                         getString(R.string.recipes_empty)
@@ -75,9 +77,10 @@ class SearchFragment : Fragment() {
                 onFailure = { error ->
                     binding.recipeRecyclerView.visibility = View.GONE
                     binding.retryRecipesButton.visibility = View.VISIBLE
+                    binding.retryRecipesButton.isEnabled = true
                     binding.recipeStatusText.visibility = View.VISIBLE
                     binding.recipeStatusText.text = error.message?.takeIf { it.isNotBlank() }
-                        ?: getString(R.string.recipes_error)
+                        ?: getString(R.string.generic_error)
                 }
             )
         }
@@ -87,6 +90,7 @@ class SearchFragment : Fragment() {
         binding.recipeStatusText.visibility = View.VISIBLE
         binding.recipeStatusText.text = getString(R.string.recipes_loading)
         binding.retryRecipesButton.visibility = View.GONE
+        binding.retryRecipesButton.isEnabled = false
         binding.recipeRecyclerView.visibility = View.GONE
     }
 
@@ -131,8 +135,12 @@ class SearchFragment : Fragment() {
     }
 
     private fun deleteRecipe(recipe: RecipeResponse) {
+        if (deleteJob?.isActive == true) {
+            return
+        }
+
         showLoading()
-        viewLifecycleOwner.lifecycleScope.launch {
+        deleteJob = viewLifecycleOwner.lifecycleScope.launch {
             val result = recipeRepository.deleteUserRecipe(recipe.id)
             if (_binding == null) return@launch
 
@@ -141,9 +149,10 @@ class SearchFragment : Fragment() {
                 onFailure = { error ->
                     binding.recipeRecyclerView.visibility = View.GONE
                     binding.retryRecipesButton.visibility = View.VISIBLE
+                    binding.retryRecipesButton.isEnabled = true
                     binding.recipeStatusText.visibility = View.VISIBLE
                     binding.recipeStatusText.text = error.message?.takeIf { it.isNotBlank() }
-                        ?: getString(R.string.recipes_error)
+                        ?: getString(R.string.generic_error)
                 }
             )
         }

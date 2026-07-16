@@ -8,12 +8,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.crumb.data.HealthRepository
 import com.example.crumb.databinding.FragmentProfileBinding
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val healthRepository = HealthRepository()
+    private var healthJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
@@ -29,10 +31,14 @@ class ProfileFragment : Fragment() {
     }
 
     private fun checkBackendHealth() {
+        if (healthJob?.isActive == true) {
+            return
+        }
+
         binding.backendStatusValue.text = getString(R.string.backend_status_checking)
         binding.retryButton.isEnabled = false
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        healthJob = viewLifecycleOwner.lifecycleScope.launch {
             val result = healthRepository.checkHealth()
             if (_binding == null) return@launch
 
@@ -40,7 +46,7 @@ class ProfileFragment : Fragment() {
                 onSuccess = { getString(R.string.backend_status_connected) },
                 onFailure = { error ->
                     error.message?.takeIf { it.isNotBlank() }
-                        ?: getString(R.string.backend_status_disconnected)
+                        ?: getString(R.string.server_unavailable)
                 }
             )
             binding.retryButton.isEnabled = true

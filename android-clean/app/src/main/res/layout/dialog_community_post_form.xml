@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_cream"
+    tools:context=".CommunityPostFormDialogFragment"
+    tools:theme="@style/Theme.Crumb">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/dialog_padding">
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/form_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/create_community_post"
+            android:textColor="@color/text_dark_brown"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/post_title_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:background="@drawable/bg_rounded_field"
+            android:hint="@string/community_post_title"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences"
+            android:maxLength="120"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/post_ingredients_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@drawable/bg_rounded_field"
+            android:hint="@string/community_post_ingredients_hint"
+            android:importantForAutofill="no"
+            android:inputType="textCapWords"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/post_caption_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/instructions_field_height"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@drawable/bg_rounded_field"
+            android:gravity="top"
+            android:hint="@string/community_post_caption_hint"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine|textCapSentences"
+            android:maxLength="200"
+            android:padding="12dp"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/form_error_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:textColor="@color/error_red"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="Unable to save post."
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xlarge"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:text="@string/cancel"
+                android:textColor="@color/primary_orange"
+                app:cornerRadius="@dimen/button_radius"
+                app:strokeColor="@color/primary_orange" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/save_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginStart="@dimen/spacing_medium"
+                android:layout_weight="1"
+                android:text="@string/save"
+                app:cornerRadius="@dimen/button_radius" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

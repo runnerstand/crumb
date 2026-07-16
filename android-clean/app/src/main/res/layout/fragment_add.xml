@@ -39,8 +39,7 @@
             android:layout_height="@dimen/button_height"
             android:layout_weight="1"
             android:layout_marginStart="@dimen/spacing_small"
-            android:enabled="false"
-            android:text="Post (later)"
+            android:text="@string/create_community_post_later"
             app:cornerRadius="@dimen/button_radius" />
     </LinearLayout>
 

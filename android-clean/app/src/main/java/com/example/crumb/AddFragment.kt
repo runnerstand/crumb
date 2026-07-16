@@ -12,6 +12,7 @@ import com.example.crumb.data.IngredientRepository
 import com.example.crumb.data.IngredientResponse
 import com.example.crumb.databinding.FragmentAddBinding
 import com.google.android.material.chip.Chip
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.util.Locale
 
@@ -22,6 +23,7 @@ class AddFragment : Fragment() {
     private val ingredientAdapter = IngredientCategoryAdapter(::selectIngredient)
     private val allIngredients = mutableListOf<IngredientResponse>()
     private val selectedIngredients = linkedMapOf<String, IngredientResponse>()
+    private var loadIngredientsJob: Job? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentAddBinding.inflate(inflater, container, false)
@@ -43,14 +45,19 @@ class AddFragment : Fragment() {
             RecipeFormDialogFragment.newInstance()
                 .show(parentFragmentManager, "RecipeFormDialog")
         }
+        binding.createCommunityPostButton.setOnClickListener {
+            CommunityPostFormDialogFragment.newInstance()
+                .show(parentFragmentManager, "CommunityPostFormDialog")
+        }
 
         loadIngredients()
     }
 
     private fun loadIngredients() {
+        loadIngredientsJob?.cancel()
         showLoading()
 
-        viewLifecycleOwner.lifecycleScope.launch {
+        loadIngredientsJob = viewLifecycleOwner.lifecycleScope.launch {
             val result = ingredientRepository.getIngredientCategories()
             if (_binding == null) return@launch
 
@@ -125,6 +132,7 @@ class AddFragment : Fragment() {
         binding.loadingText.text = getString(R.string.ingredients_loading)
         binding.emptyText.visibility = View.GONE
         binding.retryButton.visibility = View.GONE
+        binding.retryButton.isEnabled = false
         binding.ingredientRecyclerView.visibility = View.GONE
     }
 
@@ -133,6 +141,7 @@ class AddFragment : Fragment() {
         binding.emptyText.visibility = View.VISIBLE
         binding.emptyText.text = message
         binding.retryButton.visibility = View.VISIBLE
+        binding.retryButton.isEnabled = true
         binding.ingredientRecyclerView.visibility = View.GONE
     }
 
