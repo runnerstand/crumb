@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:background="@color/background_cream"
+    android:padding="@dimen/screen_padding"
     tools:context=".SearchFragment"
     tools:theme="@style/Theme.Crumb">
 
@@ -12,31 +14,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/user_recipes_title"
-        android:textAppearance="?attr/textAppearanceHeadlineLarge" />
+        android:textColor="@color/text_dark_brown"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/recipe_status_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/spacing_large"
         android:text="@string/recipes_loading"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
+        android:textColor="@color/text_muted_brown"
+        android:textSize="16sp" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/retry_recipes_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:text="@string/retry"
+        app:cornerRadius="@dimen/button_radius"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recipe_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/spacing_large"
         android:layout_weight="1"
         android:clipToPadding="false"
+        android:paddingBottom="16dp"
         android:visibility="gone"
         tools:itemCount="3"
         tools:listitem="@layout/item_recipe"

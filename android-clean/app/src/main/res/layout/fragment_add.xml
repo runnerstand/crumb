@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="24dp"
+    android:background="@color/background_cream"
+    android:padding="@dimen/screen_padding"
     tools:context=".AddFragment"
     tools:theme="@style/Theme.Crumb">
 
@@ -13,45 +14,70 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/choose_ingredients_title"
-        android:textAppearance="?attr/textAppearanceHeadlineLarge" />
+        android:textColor="@color/text_dark_brown"
+        android:textSize="28sp"
+        android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/create_recipe_button"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/create_recipe" />
+        android:orientation="horizontal"
+        android:layout_marginTop="@dimen/spacing_large">
 
-    <Button
-        android:id="@+id/create_community_post_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:enabled="false"
-        android:text="@string/create_community_post_later" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/create_recipe_button"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:text="@string/create_recipe"
+            app:cornerRadius="@dimen/button_radius" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/create_community_post_button"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/spacing_small"
+            android:enabled="false"
+            android:text="Post (later)"
+            app:cornerRadius="@dimen/button_radius" />
+    </LinearLayout>
 
     <EditText
         android:id="@+id/ingredient_search_edit_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="@dimen/spacing_large"
+        android:background="@drawable/bg_search_field"
+        android:drawableStart="@drawable/ic_search"
+        android:drawablePadding="12dp"
+        android:drawableTint="@color/text_muted_brown"
         android:hint="@string/search_ingredients_hint"
         android:importantForAutofill="no"
         android:inputType="text"
-        android:maxLines="1" />
+        android:maxLines="1"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:textColor="@color/text_dark_brown"
+        android:textColorHint="@color/text_muted_brown"
+        android:textSize="15sp" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/selected_ingredients_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="@dimen/spacing_xlarge"
         android:text="@string/selected_ingredients_title"
-        android:textAppearance="?attr/textAppearanceTitleMedium" />
+        android:textColor="@color/text_dark_brown"
+        android:textSize="16sp"
+        android:textStyle="bold" />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/selected_ingredients_chip_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="@dimen/spacing_small"
         app:singleLine="false" />
 
     <com.google.android.material.textview.MaterialTextView
@@ -59,40 +85,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/selected_ingredients_empty"
-        android:textAppearance="?attr/textAppearanceBodyMedium" />
+        android:textColor="@color/text_muted_brown"
+        android:textSize="14sp" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/loading_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/spacing_xxlarge"
         android:text="@string/ingredients_loading"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
+        android:textColor="@color/text_muted_brown"
+        android:textSize="16sp" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="@dimen/spacing_xxlarge"
         android:text="@string/ingredients_empty"
-        android:textAppearance="?attr/textAppearanceBodyLarge"
+        android:textColor="@color/text_muted_brown"
+        android:textSize="16sp"
         android:visibility="gone" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/retry_button"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="@dimen/spacing_medium"
         android:text="@string/retry"
+        app:cornerRadius="@dimen/button_radius"
         android:visibility="gone" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/ingredient_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/spacing_large"
         android:layout_weight="1"
         android:clipToPadding="false"
+        android:paddingBottom="16dp"
         android:visibility="gone"
         tools:itemCount="6"
         tools:listitem="@layout/item_ingredient"

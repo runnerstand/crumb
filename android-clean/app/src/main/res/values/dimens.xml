@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="screen_padding">24dp</dimen>
+    <dimen name="dialog_padding">20dp</dimen>
+    <dimen name="card_padding">16dp</dimen>
+    <dimen name="card_margin_bottom">12dp</dimen>
+    <dimen name="card_radius">16dp</dimen>
+    <dimen name="button_radius">24dp</dimen>
+    <dimen name="search_field_radius">24dp</dimen>
+    <dimen name="button_height">48dp</dimen>
+
+    <dimen name="spacing_xsmall">4dp</dimen>
+    <dimen name="spacing_small">8dp</dimen>
+    <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_large">16dp</dimen>
+    <dimen name="spacing_xlarge">20dp</dimen>
+    <dimen name="spacing_xxlarge">24dp</dimen>
+    <dimen name="spacing_section">32dp</dimen>
+
+    <dimen name="ingredient_item_height">48dp</dimen>
+    <dimen name="instructions_field_height">120dp</dimen>
+    <dimen name="ingredient_picker_height">180dp</dimen>
+</resources>

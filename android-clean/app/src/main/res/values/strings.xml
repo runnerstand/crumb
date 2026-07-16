@@ -47,4 +47,24 @@
     <string name="delete_recipe_message">This user-created recipe will be removed.</string>
     <string name="recipe_form_error">Please enter a title, instructions, and at least one ingredient.</string>
     <string name="recipe_details_title">Recipe Details</string>
+    <string name="home_welcome_title">Hello, Foodie!</string>
+    <string name="home_welcome_subtitle">What are we cooking today?</string>
+    <string name="home_search_hint">Search recipes, ingredients...</string>
+    <string name="home_section_categories">Categories</string>
+    <string name="home_section_featured">Featured Recipe</string>
+    <string name="home_section_trending">Trending Recipes</string>
+    <string name="home_section_community">From the Community</string>
+    <string name="saved_empty_title">No Saved Recipes Yet</string>
+    <string name="saved_empty_subtitle">Explore recipes and save your favorites to view them here.</string>
+    <string name="saved_browse_button">Discover Recipes</string>
+    <string name="profile_stats_recipes">My Recipes</string>
+    <string name="profile_stats_saved">Saved</string>
+    <string name="profile_section_dietary">Dietary Preferences</string>
+    <string name="profile_section_avoid">Ingredients to Avoid</string>
+    <string name="profile_user_name">SwatD</string>
+    <string name="profile_user_email">swatd@crumb.edu</string>
+    <string name="profile_dietary_vegan">Vegetarian</string>
+    <string name="profile_dietary_gluten_free">Gluten-Free</string>
+    <string name="profile_avoid_peanuts">Peanuts</string>
+    <string name="profile_avoid_shellfish">Shellfish</string>
 </resources>

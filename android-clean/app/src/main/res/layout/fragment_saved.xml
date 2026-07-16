@@ -1,22 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background_cream"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="@dimen/screen_padding"
+    tools:theme="@style/Theme.Crumb">
+
+    <!-- Mock Saved Recipe illustration/icon wrapper -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:cardCornerRadius="50dp"
+        app:cardBackgroundColor="@color/primary_orange_light"
+        app:strokeColor="@color/primary_orange"
+        app:strokeWidth="1.5dp"
+        app:cardElevation="0dp">
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_saved"
+            app:tint="@color/primary_orange"
+            android:contentDescription="Saved bookmark icon" />
+    </com.google.android.material.card.MaterialCardView>
 
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/saved_title"
-        android:textAppearance="?attr/textAppearanceHeadlineLarge" />
+        android:layout_marginTop="24dp"
+        android:text="@string/saved_empty_title"
+        android:textColor="@color/text_dark_brown"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center" />
 
     <com.google.android.material.textview.MaterialTextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:gravity="center"
-        android:text="@string/saved_subtitle"
-        android:textAppearance="?attr/textAppearanceBodyLarge" />
+        android:text="@string/saved_empty_subtitle"
+        android:textColor="@color/text_muted_brown"
+        android:textSize="15sp"
+        android:lineSpacingMultiplier="1.2" />
+
+    <com.google.android.material.button.MaterialButton
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/button_height"
+        android:layout_marginTop="32dp"
+        android:text="@string/saved_browse_button"
+        app:cornerRadius="@dimen/button_radius" />
 </LinearLayout>
