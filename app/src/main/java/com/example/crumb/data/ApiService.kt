@@ -54,6 +54,9 @@ interface ApiService {
     @GET("recipes/user-created")
     suspend fun getUserRecipes(): List<RecipeResponse>
 
+    @GET("recipes/{recipe_id}/details")
+    suspend fun getRecipe(@Path("recipe_id") recipeId: Int): RecipeResponse
+
     @POST("recipes/user-created")
     suspend fun createUserRecipe(@Body request: RecipeRequest): RecipeResponse
 
@@ -68,4 +71,16 @@ interface ApiService {
 
     @DELETE("recipes/user-created/{recipe_id}")
     suspend fun deleteUserRecipe(@Path("recipe_id") recipeId: Int): Map<String, String>
+
+    @GET("recipes/saved")
+    suspend fun getSavedRecipes(): List<SavedRecipeResponse>
+
+    @POST("recipes/saved")
+    suspend fun saveRecipe(@Body request: SavedRecipeRequest): SavedRecipeResponse
+
+    @GET("recipes/saved/{recipe_id}")
+    suspend fun getSavedRecipeStatus(@Path("recipe_id") recipeId: Int): SavedRecipeStatusResponse
+
+    @DELETE("recipes/saved/{recipe_id}")
+    suspend fun deleteSavedRecipe(@Path("recipe_id") recipeId: Int): Map<String, String>
 }

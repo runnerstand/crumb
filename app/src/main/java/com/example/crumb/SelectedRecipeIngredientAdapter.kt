@@ -8,7 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.crumb.databinding.ItemSelectedRecipeIngredientBinding
 
 class SelectedRecipeIngredientAdapter(
-    private val onRemoveClick: (SelectedRecipeIngredient) -> Unit
+    private val onRemoveClick: (SelectedRecipeIngredient) -> Unit,
+    private val onIngredientChanged: () -> Unit
 ) : RecyclerView.Adapter<SelectedRecipeIngredientAdapter.ViewHolder>() {
     private val items = mutableListOf<SelectedRecipeIngredient>()
 
@@ -19,7 +20,8 @@ class SelectedRecipeIngredientAdapter(
                 parent,
                 false
             ),
-            onRemoveClick
+            onRemoveClick,
+            onIngredientChanged
         )
     }
 
@@ -37,7 +39,8 @@ class SelectedRecipeIngredientAdapter(
 
     class ViewHolder(
         private val binding: ItemSelectedRecipeIngredientBinding,
-        private val onRemoveClick: (SelectedRecipeIngredient) -> Unit
+        private val onRemoveClick: (SelectedRecipeIngredient) -> Unit,
+        private val onIngredientChanged: () -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         private var quantityWatcher: TextWatcher? = null
         private var unitWatcher: TextWatcher? = null
@@ -49,8 +52,14 @@ class SelectedRecipeIngredientAdapter(
             binding.selectedIngredientName.text = ingredient.name
             binding.quantityEditText.setText(ingredient.quantity)
             binding.unitEditText.setText(ingredient.unit)
-            quantityWatcher = SimpleTextWatcher { ingredient.quantity = it }
-            unitWatcher = SimpleTextWatcher { ingredient.unit = it }
+            quantityWatcher = SimpleTextWatcher {
+                ingredient.quantity = it
+                onIngredientChanged()
+            }
+            unitWatcher = SimpleTextWatcher {
+                ingredient.unit = it
+                onIngredientChanged()
+            }
             binding.quantityEditText.addTextChangedListener(quantityWatcher)
             binding.unitEditText.addTextChangedListener(unitWatcher)
             binding.removeIngredientButton.setOnClickListener {

@@ -50,10 +50,49 @@ def community_post_payload() -> dict[str, object]:
     }
 
 
+def recipe_payload() -> dict[str, object]:
+    return {
+        "title": "Tomato Egg Rice",
+        "ingredients": [
+            {
+                "ingredient_name": "eggs",
+                "quantity": "2",
+                "unit": "pieces",
+            },
+            {
+                "ingredient_name": "tomato",
+                "quantity": "1",
+                "unit": "cup",
+            },
+        ],
+        "instructions": ["Cook eggs.", "Serve with tomato and rice."],
+        "cooking_time_minutes": 20,
+    }
+
+
 def create_community_post(client: TestClient) -> dict:
     response = client.post("/community/posts", json=community_post_payload())
 
     assert response.status_code == 201
+
+    return response.json()
+
+
+def create_recipe(client: TestClient) -> dict:
+    response = client.post("/recipes/user-created", json=recipe_payload())
+
+    assert response.status_code == 201
+
+    return response.json()
+
+
+def rate_recipe(client: TestClient, recipe_id: int, rating: int) -> dict:
+    response = client.put(
+        f"/recipes/{recipe_id}/rating",
+        json={"rating": rating},
+    )
+
+    assert response.status_code == 200
 
     return response.json()
 
@@ -84,6 +123,59 @@ def test_create_community_post_uses_local_identity_and_catalogue_ingredients(
     assert body["caption"] == "Simple pantry dinner."
     assert "created_at" in body
     assert "updated_at" in body
+
+
+def test_create_linked_recipe_post_derives_recipe_details(
+    client: TestClient,
+) -> None:
+    recipe = create_recipe(client)
+
+    response = client.post(
+        "/community/posts",
+        json={"recipe_id": recipe["id"], "caption": "Sharing this one."},
+    )
+
+    assert response.status_code == 201
+    body = response.json()
+    assert body["recipe_id"] == recipe["id"]
+    assert body["title"] == "Tomato Egg Rice"
+    assert body["ingredients_json"] == ["egg", "tomato"]
+    assert body["caption"] == "Sharing this one."
+    assert body["recipe"]["id"] == recipe["id"]
+    assert body["recipe"]["cooking_time_minutes"] == 20
+
+
+def test_create_linked_recipe_post_rejects_missing_recipe(
+    client: TestClient,
+) -> None:
+    response = client.post(
+        "/community/posts",
+        json={"recipe_id": 999, "caption": "Missing recipe."},
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Recipe not found."}
+
+
+def test_delete_linked_recipe_removes_community_post(
+    client: TestClient,
+) -> None:
+    recipe = create_recipe(client)
+    post_response = client.post(
+        "/community/posts",
+        json={"recipe_id": recipe["id"], "caption": "Sharing this one."},
+    )
+
+    delete_response = client.delete(f"/recipes/user-created/{recipe['id']}")
+    posts_response = client.get("/community/posts")
+    comments_response = client.get(
+        f"/community/posts/{post_response.json()['id']}/comments"
+    )
+
+    assert delete_response.status_code == 200
+    assert posts_response.status_code == 200
+    assert posts_response.json() == []
+    assert comments_response.status_code == 404
 
 
 def test_create_community_post_rejects_blank_title(client: TestClient) -> None:
@@ -351,6 +443,83 @@ def test_delete_missing_community_comment_returns_404(client: TestClient) -> Non
 
     assert response.status_code == 404
     assert response.json() == {"detail": "Community comment not found."}
+
+
+def test_recipe_rating_summary_updates_on_upsert(client: TestClient) -> None:
+    recipe = create_recipe(client)
+
+    first_rating = rate_recipe(client, recipe["id"], 4)
+    second_rating = rate_recipe(client, recipe["id"], 5)
+    recipe_response = client.get(f"/recipes/{recipe['id']}/details")
+
+    assert first_rating["recipe_id"] == recipe["id"]
+    assert first_rating["average_rating"] == 4.0
+    assert first_rating["rating_count"] == 1
+    assert first_rating["user_rating"] == 4
+    assert second_rating["average_rating"] == 5.0
+    assert second_rating["rating_count"] == 1
+    assert second_rating["user_rating"] == 5
+    assert recipe_response.json()["average_rating"] == 5.0
+    assert recipe_response.json()["rating_count"] == 1
+    assert recipe_response.json()["user_rating"] == 5
+
+
+def test_create_comment_with_rating_updates_recipe_rating(
+    client: TestClient,
+) -> None:
+    recipe = create_recipe(client)
+    post = client.post(
+        "/community/posts",
+        json={"recipe_id": recipe["id"], "caption": "Sharing this one."},
+    ).json()
+
+    comment_response = client.post(
+        f"/community/posts/{post['id']}/comments",
+        json={
+            "comment_text": "Nice recipe.",
+            "rating": 3,
+        },
+    )
+
+    recipe_response = client.get(f"/recipes/{recipe['id']}/details")
+
+    assert comment_response.status_code == 201
+    assert comment_response.json()["comment_text"] == "Nice recipe."
+    assert recipe_response.json()["average_rating"] == 3.0
+    assert recipe_response.json()["rating_count"] == 1
+    assert recipe_response.json()["user_rating"] == 3
+
+
+def test_update_comment_with_rating_updates_recipe_rating(
+    client: TestClient,
+) -> None:
+    recipe = create_recipe(client)
+    post = client.post(
+        "/community/posts",
+        json={"recipe_id": recipe["id"], "caption": "Sharing this one."},
+    ).json()
+    comment = client.post(
+        f"/community/posts/{post['id']}/comments",
+        json={
+            "comment_text": "Nice recipe.",
+            "rating": 2,
+        },
+    ).json()
+
+    update_response = client.patch(
+        f"/community/comments/{comment['id']}",
+        json={
+            "comment_text": "Even better after trying it.",
+            "rating": 5,
+        },
+    )
+    recipe_response = client.get(f"/recipes/{recipe['id']}/details")
+
+    assert update_response.status_code == 200
+    assert update_response.json()["comment_text"] == "Even better after trying it."
+    assert recipe_response.json()["average_rating"] == 5.0
+    assert recipe_response.json()["rating_count"] == 1
+    assert recipe_response.json()["user_rating"] == 5
 
 
 def test_update_community_comment_rejects_different_creator(

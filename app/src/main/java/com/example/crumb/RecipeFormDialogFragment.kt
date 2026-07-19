@@ -11,6 +11,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.crumb.data.CommunityPostRepository
+import com.example.crumb.data.CommunityPostRequest
 import com.example.crumb.data.IngredientRepository
 import com.example.crumb.data.IngredientResponse
 import com.example.crumb.data.RecipeIngredientRequest
@@ -26,10 +28,15 @@ class RecipeFormDialogFragment : DialogFragment() {
     private val binding get() = _binding!!
     private val ingredientRepository = IngredientRepository()
     private val recipeRepository = RecipeRepository()
+    private val postRepository = CommunityPostRepository()
     private val ingredientAdapter = IngredientCategoryAdapter(::selectIngredient)
-    private val selectedIngredientAdapter = SelectedRecipeIngredientAdapter(::removeIngredient)
+    private val selectedIngredientAdapter = SelectedRecipeIngredientAdapter(
+        ::removeIngredient,
+        onIngredientChanged = {}
+    )
     private val allIngredients = mutableListOf<IngredientResponse>()
     private val selectedIngredients = linkedMapOf<String, SelectedRecipeIngredient>()
+    private var recipePendingPublish: RecipeResponse? = null
     private val recipeId: Int? by lazy {
         arguments?.getInt(ARG_RECIPE_ID)?.takeIf { it > 0 }
     }
@@ -79,7 +86,7 @@ class RecipeFormDialogFragment : DialogFragment() {
         super.onStart()
         dialog?.window?.setLayout(
             ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.MATCH_PARENT
         )
     }
 
@@ -174,6 +181,7 @@ class RecipeFormDialogFragment : DialogFragment() {
 
     private fun updateSelectedIngredients() {
         selectedIngredientAdapter.submitIngredients(selectedIngredients.values.toList())
+        binding.selectedIngredientRecyclerView.requestLayout()
         binding.selectedEmptyText.visibility =
             if (selectedIngredients.isEmpty()) View.VISIBLE else View.GONE
     }
@@ -184,10 +192,14 @@ class RecipeFormDialogFragment : DialogFragment() {
         }
 
         binding.formErrorText.visibility = View.GONE
-        val request = buildRecipeRequest() ?: run {
+        recipePendingPublish?.let { recipe ->
+            publishRecipe(recipe)
             return
         }
 
+        val request = buildRecipeRequest() ?: run {
+            return
+        }
         setSavingState(true)
         viewLifecycleOwner.lifecycleScope.launch {
             val result = recipeId?.let {
@@ -196,12 +208,44 @@ class RecipeFormDialogFragment : DialogFragment() {
             if (_binding == null) return@launch
 
             result.fold(
-                onSuccess = {
-                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_CHANGED to true))
-                    dismiss()
+                onSuccess = { recipe ->
+                    if (recipeId == null) {
+                        publishRecipe(recipe)
+                    } else {
+                        setFragmentResult(REQUEST_KEY, bundleOf(RESULT_CHANGED to true))
+                        dismiss()
+                    }
                 },
                 onFailure = { error ->
                     showFormError(error.message ?: getString(R.string.generic_error))
+                    setSavingState(false)
+                }
+            )
+        }
+    }
+
+    private fun publishRecipe(recipe: RecipeResponse) {
+        setSavingState(true)
+        viewLifecycleOwner.lifecycleScope.launch {
+            val result = postRepository.createCommunityPost(
+                CommunityPostRequest(
+                    caption = "",
+                    recipeId = recipe.id
+                )
+            )
+            if (_binding == null) return@launch
+
+            result.fold(
+                onSuccess = {
+                    recipePendingPublish = null
+                    setFragmentResult(REQUEST_KEY, bundleOf(RESULT_CHANGED to true))
+                    setFragmentResult(POST_REQUEST_KEY, bundleOf(RESULT_CHANGED to true))
+                    dismiss()
+                },
+                onFailure = {
+                    recipePendingPublish = recipe
+                    showFormError(getString(R.string.recipe_saved_publish_failed))
+                    binding.saveButton.text = getString(R.string.recipe_publish_retry)
                     setSavingState(false)
                 }
             )
@@ -292,6 +336,7 @@ class RecipeFormDialogFragment : DialogFragment() {
 
     companion object {
         const val REQUEST_KEY = "recipe_changed"
+        const val POST_REQUEST_KEY = "community_post_changed"
         const val RESULT_CHANGED = "changed"
         private const val ARG_RECIPE_ID = "recipe_id"
         private const val MAX_TITLE_LENGTH = 120

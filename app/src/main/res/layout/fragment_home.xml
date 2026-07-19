@@ -31,6 +31,7 @@
             android:textSize="16sp" />
 
         <EditText
+            android:id="@+id/home_search_field"
             android:layout_width="match_parent"
             android:layout_height="@dimen/button_height"
             android:layout_marginTop="@dimen/spacing_large"
@@ -141,6 +142,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_small"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             app:cardCornerRadius="@dimen/card_radius"
             app:cardUseCompatPadding="true"
             app:strokeColor="@color/divider_color"
@@ -151,11 +155,13 @@
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <View
-                    android:id="@+id/featured_recipe_placeholder"
+                <ImageView
+                    android:id="@+id/featured_recipe_image"
                     android:layout_width="match_parent"
                     android:layout_height="140dp"
-                    android:background="@color/primary_orange_light" />
+                    android:contentDescription="@string/recipe_image"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/recipe_placeholder" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -164,9 +170,19 @@
                     android:padding="@dimen/card_padding">
 
                     <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/featured_recipe_title"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/featured_recipe_creator_name"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:textColor="@color/text_dark_brown"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        tools:text="Local User" />
+
+                    <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/featured_recipe_title"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
                         android:textColor="@color/text_dark_brown"
                         android:textSize="20sp"
                         android:textStyle="bold"
@@ -174,29 +190,12 @@
 
                     <com.google.android.material.textview.MaterialTextView
                         android:id="@+id/featured_recipe_cooking_time"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
                         android:textColor="@color/text_muted_brown"
                         android:textSize="14sp"
                         tools:text="20 minutes" />
-
-                    <com.google.android.material.textview.MaterialTextView
-                        android:id="@+id/featured_recipe_ingredients"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:textColor="@color/text_muted_brown"
-                        android:textSize="14sp"
-                        tools:text="Ingredients: egg, rice" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/featured_recipe_view_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/spacing_medium"
-                        android:text="@string/view"
-                        app:cornerRadius="@dimen/button_radius" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
@@ -245,29 +244,14 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <LinearLayout
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/community_status_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/spacing_small"
-            android:gravity="center_vertical"
-            android:orientation="horizontal">
-
-            <com.google.android.material.textview.MaterialTextView
-                android:id="@+id/community_status_text"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/text_muted_brown"
-                android:textSize="14sp"
-                tools:text="@string/community_posts_loading" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/create_post_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/create_community_post"
-                app:cornerRadius="@dimen/button_radius" />
-        </LinearLayout>
+            android:textColor="@color/text_muted_brown"
+            android:textSize="14sp"
+            tools:text="@string/community_posts_loading" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/community_retry_button"

@@ -22,14 +22,21 @@ from app.ingredient_catalog import normalize_ingredient
 from app.measurement_conversion import MeasurementSystem
 from app.measurement_conversion import convert_measurement_text
 from app.database import get_db
+from app.models import CommunityPost
 from app.models import Ingredient
 from app.models import LOCAL_USER_ID
 from app.models import LOCAL_USER_NAME
 from app.models import Recipe
 from app.models import RecipeIngredient
+from app.models import RecipeRating
+from app.models import SavedRecipe
 from app.models import User
+from app.rating_utils import get_recipe_rating_summary
+from app.rating_utils import upsert_recipe_rating
 from app.recipe_retrieval import SemanticRecipeRetriever
 from app.schemas import RecipeCreate
+from app.schemas import RecipeRatingRead
+from app.schemas import RecipeRatingUpsert
 from app.schemas import RecipeRead
 from app.schemas import RecipeUpdate
 
@@ -69,10 +76,12 @@ def ensure_local_user(db: Session) -> None:
     db.flush()
 
 
-def serialize_recipe(recipe: Recipe) -> dict[str, Any]:
+def serialize_recipe(recipe: Recipe, db: Session) -> dict[str, Any]:
+    rating_summary = get_recipe_rating_summary(db, recipe.id)
     return {
         "id": recipe.id,
         "user_id": recipe.user_id,
+        "creator_name": recipe.creator_name,
         "title": recipe.title,
         "ingredients": [
             {
@@ -88,6 +97,9 @@ def serialize_recipe(recipe: Recipe) -> dict[str, Any]:
         ],
         "instructions": recipe.instructions,
         "cooking_time_minutes": recipe.cooking_time_minutes,
+        "average_rating": rating_summary.average_rating,
+        "rating_count": rating_summary.rating_count,
+        "user_rating": rating_summary.user_rating,
         "created_at": recipe.created_at,
     }
 
@@ -181,7 +193,7 @@ def create_user_recipe(
     db.commit()
     db.refresh(recipe)
 
-    return serialize_recipe(get_recipe_or_404(recipe.id, db))
+    return serialize_recipe(get_recipe_or_404(recipe.id, db), db)
 
 
 @router.get("/recipes/user-created", response_model=list[RecipeRead])
@@ -194,7 +206,7 @@ def list_user_recipes(db: Session = Depends(get_db)) -> list[dict[str, Any]]:
         .all()
     )
 
-    return [serialize_recipe(recipe) for recipe in recipes]
+    return [serialize_recipe(recipe, db) for recipe in recipes]
 
 
 @router.get("/recipes/user-created/{recipe_id}", response_model=RecipeRead)
@@ -207,7 +219,7 @@ def read_user_recipe(
     if recipe.user_id != LOCAL_USER_ID:
         raise HTTPException(status_code=403, detail="Only the recipe owner can view this recipe.")
 
-    return serialize_recipe(recipe)
+    return serialize_recipe(recipe, db)
 
 
 @router.patch("/recipes/user-created/{recipe_id}", response_model=RecipeRead)
@@ -229,7 +241,7 @@ def update_user_recipe(
     db.commit()
     db.refresh(recipe)
 
-    return serialize_recipe(get_recipe_or_404(recipe.id, db))
+    return serialize_recipe(get_recipe_or_404(recipe.id, db), db)
 
 
 @router.delete("/recipes/user-created/{recipe_id}")
@@ -242,10 +254,43 @@ def delete_user_recipe(
     if recipe.user_id != LOCAL_USER_ID:
         raise HTTPException(status_code=403, detail="Only the recipe owner can delete this recipe.")
 
+    db.query(CommunityPost).filter(CommunityPost.recipe_id == recipe_id).delete()
+    db.query(SavedRecipe).filter(SavedRecipe.recipe_id == recipe_id).delete()
+    db.query(RecipeRating).filter(RecipeRating.recipe_id == recipe_id).delete()
     db.delete(recipe)
     db.commit()
 
     return {"message": "Recipe deleted."}
+
+
+@router.get("/recipes/{recipe_id}/details", response_model=RecipeRead)
+def read_recipe(
+    recipe_id: int,
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
+    recipe = get_recipe_or_404(recipe_id, db)
+    return serialize_recipe(recipe, db)
+
+
+@router.get("/recipes/{recipe_id}/rating", response_model=RecipeRatingRead)
+def read_recipe_rating(
+    recipe_id: int,
+    db: Session = Depends(get_db),
+) -> RecipeRatingRead:
+    get_recipe_or_404(recipe_id, db)
+    return get_recipe_rating_summary(db, recipe_id)
+
+
+@router.put("/recipes/{recipe_id}/rating", response_model=RecipeRatingRead)
+def upsert_recipe_rating_for_recipe(
+    recipe_id: int,
+    rating_request: RecipeRatingUpsert,
+    db: Session = Depends(get_db),
+) -> RecipeRatingRead:
+    get_recipe_or_404(recipe_id, db)
+    upsert_recipe_rating(db, recipe_id, rating_request.rating)
+    db.commit()
+    return get_recipe_rating_summary(db, recipe_id)
 
 
 class RecipeMatchRequest(BaseModel):

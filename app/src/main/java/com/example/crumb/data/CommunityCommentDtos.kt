@@ -4,7 +4,8 @@ import com.squareup.moshi.Json
 
 data class CommunityCommentRequest(
     @param:Json(name = "comment_text")
-    val commentText: String
+    val commentText: String,
+    val rating: Int? = null
 )
 
 data class CommunityCommentResponse(

@@ -1,58 +1,126 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_cream"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="@dimen/screen_padding"
+    android:fillViewport="true"
     tools:theme="@style/Theme.Crumb">
 
-    <!-- Mock Saved Recipe illustration/icon wrapper -->
-    <com.google.android.material.card.MaterialCardView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        app:cardCornerRadius="50dp"
-        app:cardBackgroundColor="@color/primary_orange_light"
-        app:strokeColor="@color/primary_orange"
-        app:strokeWidth="1.5dp"
-        app:cardElevation="0dp">
-
-        <ImageView
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_saved"
-            app:tint="@color/primary_orange"
-            android:contentDescription="Saved bookmark icon" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="@string/saved_empty_title"
-        android:textColor="@color/text_dark_brown"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:gravity="center" />
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding">
 
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:gravity="center"
-        android:text="@string/saved_empty_subtitle"
-        android:textColor="@color/text_muted_brown"
-        android:textSize="15sp"
-        android:lineSpacingMultiplier="1.2" />
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/saved_title"
+            android:textColor="@color/text_dark_brown"
+            android:textSize="28sp"
+            android:textStyle="bold" />
 
-    <com.google.android.material.button.MaterialButton
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_height"
-        android:layout_marginTop="32dp"
-        android:text="@string/saved_browse_button"
-        app:cornerRadius="@dimen/button_radius" />
-</LinearLayout>
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/saved_subtitle"
+            android:textColor="@color/text_muted_brown"
+            android:textSize="16sp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/saved_status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:textColor="@color/text_muted_brown"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="@string/saved_loading"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/saved_retry_button"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:text="@string/retry"
+            android:textColor="@color/primary_orange"
+            android:visibility="gone"
+            app:cornerRadius="@dimen/button_radius"
+            app:strokeColor="@color/primary_orange"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/saved_empty_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="72dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:cardBackgroundColor="@color/primary_orange_light"
+                app:cardCornerRadius="50dp"
+                app:cardElevation="0dp"
+                app:strokeColor="@color/primary_orange"
+                app:strokeWidth="1.5dp">
+
+                <ImageView
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@string/saved_bookmark_icon"
+                    android:src="@drawable/ic_saved"
+                    app:tint="@color/primary_orange" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:gravity="center"
+                android:text="@string/saved_empty_title"
+                android:textColor="@color/text_dark_brown"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:lineSpacingMultiplier="1.2"
+                android:text="@string/saved_empty_subtitle"
+                android:textColor="@color/text_muted_brown"
+                android:textSize="15sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/saved_browse_button"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginTop="32dp"
+                android:text="@string/saved_browse_button"
+                app:cornerRadius="@dimen/button_radius" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/saved_recipes_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:nestedScrollingEnabled="false"
+            android:visibility="gone"
+            tools:itemCount="3"
+            tools:listitem="@layout/item_saved_recipe"
+            tools:visibility="visible" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

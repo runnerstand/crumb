@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_cream"
+    android:fillViewport="true"
     tools:context=".RecipeFormDialogFragment"
     tools:theme="@style/Theme.Crumb">
 

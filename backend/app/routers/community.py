@@ -5,12 +5,17 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
+from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.ingredient_catalog import canonicalize_ingredient
 from app.ingredient_catalog import load_ingredients
 from app.models import CommunityComment
 from app.models import CommunityPost
+from app.models import Recipe
+from app.models import RecipeIngredient
+from app.rating_utils import get_recipe_rating_summary
+from app.rating_utils import upsert_recipe_rating
 from app.schemas import CommunityCommentCreate
 from app.schemas import CommunityCommentRead
 from app.schemas import CommunityCommentUpdate
@@ -23,6 +28,67 @@ router = APIRouter()
 
 LOCAL_CREATOR_ID = "local-user"
 LOCAL_CREATOR_NAME = "Local User"
+
+
+def serialize_recipe(recipe: Recipe, db: Session) -> dict:
+    rating_summary = get_recipe_rating_summary(db, recipe.id)
+    return {
+        "id": recipe.id,
+        "user_id": recipe.user_id,
+        "creator_name": recipe.creator_name,
+        "title": recipe.title,
+        "ingredients": [
+            {
+                "ingredient_id": recipe_ingredient.ingredient_id,
+                "ingredient_name": recipe_ingredient.ingredient.name,
+                "quantity": recipe_ingredient.quantity,
+                "unit": recipe_ingredient.unit,
+            }
+            for recipe_ingredient in sorted(
+                recipe.ingredients,
+                key=lambda item: item.ingredient.name,
+            )
+        ],
+        "instructions": recipe.instructions,
+        "cooking_time_minutes": recipe.cooking_time_minutes,
+        "average_rating": rating_summary.average_rating,
+        "rating_count": rating_summary.rating_count,
+        "user_rating": rating_summary.user_rating,
+        "created_at": recipe.created_at,
+    }
+
+
+def serialize_community_post(post: CommunityPost, db: Session) -> dict:
+    recipe = post.recipe
+    if recipe is None:
+        return {
+            "id": post.id,
+            "creator_id": post.creator_id,
+            "creator_name": post.creator_name,
+            "recipe_id": post.recipe_id,
+            "title": post.title,
+            "ingredients_json": post.ingredients_json,
+            "caption": post.caption,
+            "recipe": None,
+            "created_at": post.created_at,
+            "updated_at": post.updated_at,
+        }
+
+    recipe_data = serialize_recipe(recipe, db)
+    return {
+        "id": post.id,
+        "creator_id": post.creator_id,
+        "creator_name": post.creator_name,
+        "recipe_id": recipe.id,
+        "title": recipe.title,
+        "ingredients_json": [
+            ingredient["ingredient_name"] for ingredient in recipe_data["ingredients"]
+        ],
+        "caption": post.caption,
+        "recipe": recipe_data,
+        "created_at": post.created_at,
+        "updated_at": post.updated_at,
+    }
 
 
 def normalize_supported_community_ingredients(ingredients: list[str]) -> list[str]:
@@ -54,6 +120,16 @@ def normalize_supported_community_ingredients(ingredients: list[str]) -> list[st
     return normalized_ingredients
 
 
+def get_linked_recipe_id(community_post: CommunityPost) -> int | None:
+    if community_post.recipe_id is not None:
+        return community_post.recipe_id
+
+    if community_post.recipe is not None:
+        return community_post.recipe.id
+
+    return None
+
+
 @router.post(
     "/community/posts",
     response_model=CommunityPostRead,
@@ -62,13 +138,46 @@ def normalize_supported_community_ingredients(ingredients: list[str]) -> list[st
 def create_community_post(
     post: CommunityPostCreate,
     db: Session = Depends(get_db),
-) -> CommunityPost:
-    ingredients = normalize_supported_community_ingredients(post.ingredients)
+) -> dict:
+    recipe = None
+    if post.recipe_id is not None:
+        recipe = (
+            db.query(Recipe)
+            .options(selectinload(Recipe.ingredients).selectinload(RecipeIngredient.ingredient))
+            .filter(Recipe.id == post.recipe_id)
+            .first()
+        )
+        if recipe is None:
+            raise HTTPException(status_code=404, detail="Recipe not found.")
+
+        existing_post = (
+            db.query(CommunityPost)
+            .filter(CommunityPost.recipe_id == post.recipe_id)
+            .first()
+        )
+        if existing_post is not None:
+            raise HTTPException(
+                status_code=400,
+                detail="Recipe is already published.",
+            )
+
+        title = recipe.title
+        ingredients = [
+            recipe_ingredient.ingredient.name
+            for recipe_ingredient in sorted(
+                recipe.ingredients,
+                key=lambda item: item.ingredient.name,
+            )
+        ]
+    else:
+        title = post.title
+        ingredients = normalize_supported_community_ingredients(post.ingredients)
 
     community_post = CommunityPost(
         creator_id=LOCAL_CREATOR_ID,
         creator_name=LOCAL_CREATOR_NAME,
-        title=post.title,
+        recipe_id=post.recipe_id,
+        title=title,
         ingredients_json=ingredients,
         caption=post.caption,
     )
@@ -77,12 +186,25 @@ def create_community_post(
     db.commit()
     db.refresh(community_post)
 
-    return community_post
+    if recipe is not None:
+        community_post.recipe = recipe
+
+    return serialize_community_post(community_post, db)
 
 
 @router.get("/community/posts", response_model=list[CommunityPostRead])
-def list_community_posts(db: Session = Depends(get_db)) -> list[CommunityPost]:
-    return db.query(CommunityPost).order_by(CommunityPost.created_at.desc()).all()
+def list_community_posts(db: Session = Depends(get_db)) -> list[dict]:
+    posts = (
+        db.query(CommunityPost)
+        .options(
+            selectinload(CommunityPost.recipe)
+            .selectinload(Recipe.ingredients)
+            .selectinload(RecipeIngredient.ingredient)
+        )
+        .order_by(CommunityPost.created_at.desc())
+        .all()
+    )
+    return [serialize_community_post(post, db) for post in posts]
 
 
 @router.patch("/community/posts/{post_id}", response_model=CommunityPostRead)
@@ -91,8 +213,17 @@ def update_community_post(
     post: CommunityPostUpdate,
     creator_id: str = LOCAL_CREATOR_ID,
     db: Session = Depends(get_db),
-) -> CommunityPost:
-    community_post = db.get(CommunityPost, post_id)
+) -> dict:
+    community_post = (
+        db.query(CommunityPost)
+        .options(
+            selectinload(CommunityPost.recipe)
+            .selectinload(Recipe.ingredients)
+            .selectinload(RecipeIngredient.ingredient)
+        )
+        .filter(CommunityPost.id == post_id)
+        .first()
+    )
 
     if community_post is None:
         raise HTTPException(status_code=404, detail="Community post not found.")
@@ -103,17 +234,19 @@ def update_community_post(
             detail="Only the post creator can update this post.",
         )
 
-    community_post.title = post.title
-    community_post.ingredients_json = normalize_supported_community_ingredients(
-        post.ingredients
-    )
+    if community_post.recipe_id is None:
+        community_post.title = post.title
+        community_post.ingredients_json = normalize_supported_community_ingredients(
+            post.ingredients
+        )
+
     community_post.caption = post.caption
     community_post.updated_at = datetime.now(timezone.utc)
 
     db.commit()
     db.refresh(community_post)
 
-    return community_post
+    return serialize_community_post(community_post, db)
 
 
 @router.delete("/community/posts/{post_id}")
@@ -162,6 +295,14 @@ def create_community_comment(
     )
 
     db.add(community_comment)
+    if comment.rating is not None:
+        linked_recipe_id = get_linked_recipe_id(community_post)
+        if linked_recipe_id is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Ratings require a linked recipe.",
+            )
+        upsert_recipe_rating(db, linked_recipe_id, comment.rating)
     db.commit()
     db.refresh(community_comment)
 
@@ -212,6 +353,15 @@ def update_community_comment(
 
     community_comment.comment_text = comment.comment_text
     community_comment.updated_at = datetime.now(timezone.utc)
+
+    if comment.rating is not None:
+        linked_recipe_id = get_linked_recipe_id(community_comment.post)
+        if linked_recipe_id is None:
+            raise HTTPException(
+                status_code=400,
+                detail="Ratings require a linked recipe.",
+            )
+        upsert_recipe_rating(db, linked_recipe_id, comment.rating)
 
     db.commit()
     db.refresh(community_comment)

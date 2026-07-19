@@ -34,4 +34,30 @@
         android:name="com.example.crumb.ProfileFragment"
         android:label="@string/profile_title"
         tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/recipePostDetailFragment"
+        android:name="com.example.crumb.RecipePostDetailFragment"
+        android:label="Recipe Details"
+        tools:layout="@layout/fragment_recipe_post_detail">
+        <argument
+            android:name="postId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="recipeId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/editRecipeFragment"
+        android:name="com.example.crumb.EditRecipeFragment"
+        android:label="@string/edit_recipe"
+        tools:layout="@layout/fragment_add">
+        <argument
+            android:name="recipeId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+    </fragment>
 </navigation>

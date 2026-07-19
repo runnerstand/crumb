@@ -57,6 +57,17 @@ class Recipe(Base):
         back_populates="recipe",
         cascade="all, delete-orphan",
     )
+    community_posts: Mapped[list["CommunityPost"]] = relationship(
+        back_populates="recipe",
+    )
+    ratings: Mapped[list["RecipeRating"]] = relationship(
+        back_populates="recipe",
+        cascade="all, delete-orphan",
+    )
+
+    @property
+    def creator_name(self) -> str:
+        return self.creator.display_name if self.creator else LOCAL_USER_NAME
 
 
 class Ingredient(Base):
@@ -95,26 +106,46 @@ class RecipeIngredient(Base):
     recipe: Mapped[Recipe] = relationship(back_populates="ingredients")
     ingredient: Mapped[Ingredient] = relationship(back_populates="recipes")
 
+    @property
+    def ingredient_name(self) -> str:
+        return self.ingredient.name
+
 
 class SavedRecipe(Base):
     __tablename__ = "saved_recipes"
+    __table_args__ = (
+        UniqueConstraint("user_id", "recipe_id", name="uq_saved_recipe_user_recipe"),
+    )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
-    title: Mapped[str] = mapped_column(String, nullable=False)
-    ingredients: Mapped[list[str]] = mapped_column(JSON, nullable=False)
-    ingredient_measurements: Mapped[list[dict]] = mapped_column(
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+        default=LOCAL_USER_ID,
+    )
+    recipe_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recipes.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
+    title: Mapped[str | None] = mapped_column(String, nullable=True)
+    ingredients: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    ingredient_measurements: Mapped[list[dict] | None] = mapped_column(
         JSON,
         default=list,
-        nullable=False,
+        nullable=True,
     )
-    missing_ingredients: Mapped[list[str]] = mapped_column(JSON, nullable=False)
-    instructions: Mapped[list[str]] = mapped_column(JSON, nullable=False)
-    cooking_time_minutes: Mapped[int] = mapped_column(Integer, nullable=False)
+    missing_ingredients: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    instructions: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
+    cooking_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         nullable=False,
     )
+    user: Mapped[User] = relationship()
+    recipe: Mapped[Recipe | None] = relationship()
 
 
 class CommunityPost(Base):
@@ -123,6 +154,11 @@ class CommunityPost(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     creator_id: Mapped[str] = mapped_column(String, nullable=False, index=True)
     creator_name: Mapped[str] = mapped_column(String, nullable=False)
+    recipe_id: Mapped[int | None] = mapped_column(
+        ForeignKey("recipes.id", ondelete="CASCADE"),
+        nullable=True,
+        index=True,
+    )
     title: Mapped[str] = mapped_column(String, nullable=False)
     ingredients_json: Mapped[list[str]] = mapped_column(JSON, nullable=False)
     caption: Mapped[str] = mapped_column(String(200), nullable=False)
@@ -140,6 +176,7 @@ class CommunityPost(Base):
         back_populates="post",
         cascade="all, delete-orphan",
     )
+    recipe: Mapped[Recipe | None] = relationship(back_populates="community_posts")
 
 
 class CommunityComment(Base):
@@ -165,3 +202,36 @@ class CommunityComment(Base):
         nullable=False,
     )
     post: Mapped[CommunityPost] = relationship(back_populates="comments")
+
+
+class RecipeRating(Base):
+    __tablename__ = "recipe_ratings"
+    __table_args__ = (
+        UniqueConstraint("user_id", "recipe_id", name="uq_recipe_rating_user_recipe"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    recipe_id: Mapped[int] = mapped_column(
+        ForeignKey("recipes.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    user_id: Mapped[str] = mapped_column(
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+        default=LOCAL_USER_ID,
+    )
+    rating: Mapped[int] = mapped_column(Integer, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
+
+    recipe: Mapped[Recipe] = relationship(back_populates="ratings")

@@ -1,130 +1,216 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="@color/background_cream"
-    android:padding="@dimen/screen_padding"
+    android:fillViewport="true"
     tools:context=".AddFragment"
     tools:theme="@style/Theme.Crumb">
-
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/choose_ingredients_title"
-        android:textColor="@color/text_dark_brown"
-        android:textSize="28sp"
-        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="@dimen/spacing_large">
+        android:orientation="vertical"
+        android:padding="@dimen/screen_padding">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/create_recipe_button"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_height"
-            android:layout_weight="1"
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/form_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:text="@string/create_recipe"
-            app:cornerRadius="@dimen/button_radius" />
+            android:textColor="@color/text_dark_brown"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/draft_restored_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/recipe_draft_restored"
+            android:textColor="@color/text_muted_brown"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <EditText
+            android:id="@+id/recipe_title_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:background="@drawable/bg_rounded_field"
+            android:hint="@string/recipe_title"
+            android:importantForAutofill="no"
+            android:inputType="textCapSentences"
+            android:maxLength="120"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/cooking_time_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@drawable/bg_rounded_field"
+            android:hint="@string/cooking_time_minutes"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="4"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <EditText
+            android:id="@+id/instructions_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/instructions_field_height"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@drawable/bg_rounded_field"
+            android:gravity="top"
+            android:hint="@string/instructions_hint"
+            android:importantForAutofill="no"
+            android:inputType="textMultiLine|textCapSentences"
+            android:maxLength="4000"
+            android:padding="12dp"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xlarge"
+            android:text="@string/select_ingredients"
+            android:textColor="@color/text_dark_brown"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/ingredient_search_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:background="@drawable/bg_search_field"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="12dp"
+            android:drawableTint="@color/text_muted_brown"
+            android:hint="@string/search_ingredients_hint"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/ingredient_status_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:text="@string/ingredients_loading"
+            android:textColor="@color/text_muted_brown"
+            android:textSize="14sp" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/create_community_post_button"
-            style="@style/Widget.Material3.Button.TonalButton"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/button_height"
-            android:layout_weight="1"
-            android:layout_marginStart="@dimen/spacing_small"
-            android:text="@string/create_community_post_later"
-            app:cornerRadius="@dimen/button_radius" />
+            android:id="@+id/ingredient_retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:text="@string/retry"
+            android:visibility="gone"
+            app:cornerRadius="@dimen/button_radius"
+            tools:visibility="gone" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/ingredient_picker_height"
+            android:layout_marginTop="@dimen/spacing_small"
+            app:cardCornerRadius="12dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/divider_color"
+            app:strokeWidth="1dp">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/ingredient_recycler_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:itemCount="4"
+                tools:listitem="@layout/item_ingredient" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xlarge"
+            android:text="@string/selected_ingredients_title"
+            android:textColor="@color/text_dark_brown"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/selected_empty_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="@string/selected_ingredients_empty"
+            android:textColor="@color/text_muted_brown"
+            android:textSize="14sp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/selected_ingredient_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:nestedScrollingEnabled="false"
+            tools:itemCount="5"
+            tools:listitem="@layout/item_selected_recipe_ingredient" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/form_error_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:textColor="@color/error_red"
+            android:textSize="14sp"
+            android:visibility="gone"
+            tools:text="Unable to save recipe."
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xlarge"
+            android:layout_marginBottom="@dimen/spacing_large"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/cancel_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_weight="1"
+                android:text="@string/discard_draft"
+                android:textColor="@color/primary_orange"
+                app:cornerRadius="@dimen/button_radius"
+                app:strokeColor="@color/primary_orange" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/save_button"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/button_height"
+                android:layout_marginStart="@dimen/spacing_medium"
+                android:layout_weight="1"
+                android:text="@string/save"
+                app:cornerRadius="@dimen/button_radius" />
+        </LinearLayout>
     </LinearLayout>
-
-    <EditText
-        android:id="@+id/ingredient_search_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/button_height"
-        android:layout_marginTop="@dimen/spacing_large"
-        android:background="@drawable/bg_search_field"
-        android:drawableStart="@drawable/ic_search"
-        android:drawablePadding="12dp"
-        android:drawableTint="@color/text_muted_brown"
-        android:hint="@string/search_ingredients_hint"
-        android:importantForAutofill="no"
-        android:inputType="text"
-        android:maxLines="1"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:textColor="@color/text_dark_brown"
-        android:textColorHint="@color/text_muted_brown"
-        android:textSize="15sp" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/selected_ingredients_label"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_xlarge"
-        android:text="@string/selected_ingredients_title"
-        android:textColor="@color/text_dark_brown"
-        android:textSize="16sp"
-        android:textStyle="bold" />
-
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/selected_ingredients_chip_group"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_small"
-        app:singleLine="false" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/selected_ingredients_empty"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/selected_ingredients_empty"
-        android:textColor="@color/text_muted_brown"
-        android:textSize="14sp" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/loading_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_xxlarge"
-        android:text="@string/ingredients_loading"
-        android:textColor="@color/text_muted_brown"
-        android:textSize="16sp" />
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/empty_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/spacing_xxlarge"
-        android:text="@string/ingredients_empty"
-        android:textColor="@color/text_muted_brown"
-        android:textSize="16sp"
-        android:visibility="gone" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/retry_button"
-        android:layout_width="wrap_content"
-        android:layout_height="@dimen/button_height"
-        android:layout_marginTop="@dimen/spacing_medium"
-        android:text="@string/retry"
-        app:cornerRadius="@dimen/button_radius"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/ingredient_recycler_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="@dimen/spacing_large"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        android:visibility="gone"
-        tools:itemCount="6"
-        tools:listitem="@layout/item_ingredient"
-        tools:visibility="visible" />
-</LinearLayout>
+</ScrollView>

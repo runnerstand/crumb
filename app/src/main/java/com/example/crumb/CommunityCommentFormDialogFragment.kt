@@ -6,9 +6,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.button.MaterialButton
 import com.example.crumb.data.CommunityCommentRepository
 import com.example.crumb.data.CommunityCommentRequest
 import com.example.crumb.data.CommunityCommentResponse
@@ -28,6 +30,10 @@ class CommunityCommentFormDialogFragment : DialogFragment() {
     private val existingComment: String by lazy {
         arguments?.getString(ARG_COMMENT_TEXT).orEmpty()
     }
+    private val initialRating: Int by lazy {
+        arguments?.getInt(ARG_INITIAL_RATING, 0)?.coerceIn(0, 5) ?: 0
+    }
+    private var selectedRating = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,6 +54,8 @@ class CommunityCommentFormDialogFragment : DialogFragment() {
         }
         binding.commentEditText.filters = arrayOf(InputFilter.LengthFilter(MAX_COMMENT_LENGTH))
         binding.commentEditText.setText(existingComment)
+        selectedRating = initialRating
+        setupRatingControls()
         binding.cancelButton.setOnClickListener {
             dismiss()
         }
@@ -103,7 +111,41 @@ class CommunityCommentFormDialogFragment : DialogFragment() {
             return null
         }
 
-        return CommunityCommentRequest(commentText = commentText)
+        return CommunityCommentRequest(
+            commentText = commentText,
+            rating = selectedRating.takeIf { it in 1..5 }
+        )
+    }
+
+    private fun setupRatingControls() {
+        ratingButtons().forEachIndexed { index, button ->
+            button.setOnClickListener {
+                selectedRating = index + 1
+                updateRatingSelection()
+            }
+        }
+        updateRatingSelection()
+    }
+
+    private fun updateRatingSelection() {
+        ratingButtons().forEachIndexed { index, button ->
+            val isSelected = index + 1 <= selectedRating
+            button.iconTint = ContextCompat.getColorStateList(
+                requireContext(),
+                if (isSelected) R.color.primary_orange else R.color.text_muted_brown
+            )
+            button.isSelected = isSelected
+        }
+    }
+
+    private fun ratingButtons(): List<MaterialButton> {
+        return listOf(
+            binding.commentRatingStar1,
+            binding.commentRatingStar2,
+            binding.commentRatingStar3,
+            binding.commentRatingStar4,
+            binding.commentRatingStar5
+        )
     }
 
     private fun showFormError(message: String) {
@@ -127,17 +169,20 @@ class CommunityCommentFormDialogFragment : DialogFragment() {
         private const val ARG_POST_ID = "post_id"
         private const val ARG_COMMENT_ID = "comment_id"
         private const val ARG_COMMENT_TEXT = "comment_text"
+        private const val ARG_INITIAL_RATING = "initial_rating"
         private const val MAX_COMMENT_LENGTH = 500
 
         fun newInstance(
             postId: Int,
-            comment: CommunityCommentResponse? = null
+            comment: CommunityCommentResponse? = null,
+            initialRating: Int = 0
         ): CommunityCommentFormDialogFragment {
             return CommunityCommentFormDialogFragment().apply {
                 arguments = bundleOf(
                     ARG_POST_ID to postId,
                     ARG_COMMENT_ID to (comment?.id ?: 0),
-                    ARG_COMMENT_TEXT to comment?.commentText.orEmpty()
+                    ARG_COMMENT_TEXT to comment?.commentText.orEmpty(),
+                    ARG_INITIAL_RATING to initialRating
                 )
             }
         }

@@ -48,7 +48,6 @@
         </LinearLayout>
 
         <!-- STATS BADGES -->
-        <!-- Static prototype counts -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -73,12 +72,14 @@
                     android:padding="@dimen/card_padding">
 
                     <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/profile_recipe_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="4"
+                        android:text="@string/profile_count_loading"
                         android:textColor="@color/primary_orange"
                         android:textSize="24sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        tools:text="4" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
@@ -90,7 +91,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Saved Recipes Badge -->
+            <!-- My Posts Badge -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -108,18 +109,20 @@
                     android:padding="@dimen/card_padding">
 
                     <com.google.android.material.textview.MaterialTextView
+                        android:id="@+id/profile_post_count"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="12"
+                        android:text="@string/profile_count_loading"
                         android:textColor="@color/primary_orange"
                         android:textSize="24sp"
-                        android:textStyle="bold" />
+                        android:textStyle="bold"
+                        tools:text="12" />
 
                     <com.google.android.material.textview.MaterialTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="@string/profile_stats_saved"
+                        android:text="@string/profile_stats_posts"
                         android:textColor="@color/text_muted_brown"
                         android:textSize="13sp" />
                 </LinearLayout>
@@ -149,38 +152,6 @@
                 android:layout_height="wrap_content"
                 android:checkable="true"
                 android:text="@string/profile_dietary_vegetarian" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/dietary_vegan_chip"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="@string/profile_dietary_vegan" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/dietary_halal_chip"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="@string/profile_dietary_halal" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/dietary_gluten_free_chip"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="@string/profile_dietary_gluten_free" />
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/dietary_dairy_free_chip"
-                style="@style/Widget.Material3.Chip.Filter"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checkable="true"
-                android:text="@string/profile_dietary_dairy_free" />
         </com.google.android.material.chip.ChipGroup>
 
         <com.google.android.material.textview.MaterialTextView

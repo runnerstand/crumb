@@ -9,6 +9,12 @@ class RecipeRepository(
         }
     }
 
+    suspend fun getRecipe(recipeId: Int): Result<RecipeResponse> {
+        return safeApiCall {
+            apiService.getRecipe(recipeId)
+        }
+    }
+
     suspend fun getUserRecipe(recipeId: Int): Result<RecipeResponse> {
         return safeApiCall {
             apiService.getUserRecipe(recipeId)
