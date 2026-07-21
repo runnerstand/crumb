@@ -5,6 +5,15 @@ echo Starting Smart Pantry backend...
 echo Current folder: %cd%
 echo.
 
+if exist ".env.local" (
+    echo Loading local environment from .env.local...
+    for /f "usebackq eol=# tokens=1,* delims==" %%A in (".env.local") do (
+        if not "%%A"=="" if not "%%B"=="" set "%%A=%%B"
+    )
+) else (
+    echo No .env.local found. Copy .env.example to .env.local for MySQL development.
+)
+
 if not exist ".venv\Scripts\python.exe" (
     echo Virtual environment was not found.
     echo Creating .venv...

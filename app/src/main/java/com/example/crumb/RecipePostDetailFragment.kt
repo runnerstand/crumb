@@ -23,6 +23,7 @@ import com.example.crumb.data.RecipeIngredientResponse
 import com.example.crumb.data.RecipeRepository
 import com.example.crumb.data.RecipeResponse
 import com.example.crumb.data.SavedRecipeRepository
+import com.example.crumb.data.UserVisibleApiException
 import com.example.crumb.databinding.FragmentRecipePostDetailBinding
 import com.example.crumb.databinding.ItemRecipePostDirectionBinding
 import com.example.crumb.databinding.ItemRecipePostIngredientBinding
@@ -61,7 +62,8 @@ class RecipePostDetailFragment : Fragment() {
     private var currentRecipe: RecipeResponse? = null
     private var currentCommentsPostId: Int = NO_POST_ID
     private var currentUserRating: Int = 0
-    private var servings = 2
+    private var originalServings = DEFAULT_ORIGINAL_SERVINGS
+    private var currentServings = DEFAULT_ORIGINAL_SERVINGS
     private var isMetric = true
     private var isSaved = false
     private var isNavigatingToRecommendation = false
@@ -111,11 +113,12 @@ class RecipePostDetailFragment : Fragment() {
         currentCommentsPostId = postId
 
         loadRecipeJob?.cancel()
+        showRecipeLoading()
         loadRecipeJob = viewLifecycleOwner.lifecycleScope.launch {
             val linkedPost = if (postId > 0) {
                 postRepository.getCommunityPosts().getOrNull()
                     ?.firstOrNull { post ->
-                        post.id == postId && (post.recipeId == recipeId || post.recipe?.id == recipeId)
+                        post.id == postId && post.recipeId == recipeId
                     }
             } else {
                 null
@@ -126,20 +129,83 @@ class RecipePostDetailFragment : Fragment() {
 
             result.fold(
                 onSuccess = { recipe ->
+                    val shouldResetServings = currentRecipe?.id != recipe.id
                     currentRecipe = recipe
-                    bindRecipe(recipe, linkedPost)
+                    showRecipeContent()
+                    bindRecipe(recipe, linkedPost, shouldResetServings)
                     loadCommentsForCurrentPost()
                     loadSavedState(recipe.id)
                     loadRecommendations(recipe.id)
                 },
                 onFailure = { error ->
-                    Toast.makeText(requireContext(), error.message ?: getString(R.string.recipes_error), Toast.LENGTH_SHORT).show()
+                    currentRecipe = null
+                    if ((error as? UserVisibleApiException)?.statusCode == 404) {
+                        showRecipeNotFound()
+                    } else {
+                        showRecipeLoadError(
+                            error.message?.takeIf { it.isNotBlank() }
+                                ?: getString(R.string.recipes_error)
+                        )
+                    }
                 }
             )
         }
     }
 
-    private fun bindRecipe(recipe: RecipeResponse, post: CommunityPostResponse?) {
+    private fun showRecipeLoading() {
+        binding.recipeImageCard.visibility = View.GONE
+        binding.bookmarkButton.visibility = View.GONE
+        binding.recipeContentContainer.visibility = View.GONE
+        binding.detailStatusContainer.visibility = View.VISIBLE
+        binding.detailStatusText.text = getString(R.string.recipe_details_loading)
+        binding.detailStatusBackButton.visibility = View.GONE
+        clearRecipeSections()
+    }
+
+    private fun showRecipeContent() {
+        binding.recipeImageCard.visibility = View.VISIBLE
+        binding.bookmarkButton.visibility = View.VISIBLE
+        binding.recipeContentContainer.visibility = View.VISIBLE
+        binding.detailStatusContainer.visibility = View.GONE
+        binding.detailStatusBackButton.visibility = View.VISIBLE
+    }
+
+    private fun showRecipeNotFound() {
+        binding.recipeImageCard.visibility = View.GONE
+        binding.bookmarkButton.visibility = View.GONE
+        binding.recipeContentContainer.visibility = View.GONE
+        binding.detailStatusContainer.visibility = View.VISIBLE
+        binding.detailStatusText.text = getString(R.string.recipe_not_found)
+        binding.detailStatusBackButton.visibility = View.VISIBLE
+        clearRecipeSections()
+    }
+
+    private fun showRecipeLoadError(message: String) {
+        binding.recipeImageCard.visibility = View.GONE
+        binding.bookmarkButton.visibility = View.GONE
+        binding.recipeContentContainer.visibility = View.GONE
+        binding.detailStatusContainer.visibility = View.VISIBLE
+        binding.detailStatusText.text = message
+        binding.detailStatusBackButton.visibility = View.VISIBLE
+        clearRecipeSections()
+    }
+
+    private fun clearRecipeSections() {
+        binding.ingredientsList.removeAllViews()
+        binding.directionsList.removeAllViews()
+        commentAdapter.submitComments(emptyList())
+        (binding.recommendationsList.adapter as? RecommendationsAdapter)?.submitPosts(emptyList())
+        binding.commentsStatusText.visibility = View.GONE
+        binding.commentsRetryButton.visibility = View.GONE
+        binding.recommendationsStatusText.visibility = View.GONE
+        binding.ownerRecipeActions.visibility = View.GONE
+    }
+
+    private fun bindRecipe(
+        recipe: RecipeResponse,
+        post: CommunityPostResponse?,
+        resetServings: Boolean
+    ) {
         binding.recipeTitle.text = recipe.title
         binding.creatorName.text = post?.creatorName
             ?: recipe.creatorName
@@ -149,7 +215,14 @@ class RecipePostDetailFragment : Fragment() {
         binding.recipeRating.text = formatRecipeRating(recipe.averageRating, recipe.ratingCount)
         binding.cookingTime.text = recipe.cookingTimeMinutes?.let { "$it mins" }
             ?: getString(R.string.no_cooking_time)
-        binding.servingCount.text = servings.toString()
+        binding.recipePostImage.loadRecipeImage(recipe.imageUrl)
+        if (resetServings) {
+            originalServings = getOriginalServingCount(recipe)
+            currentServings = originalServings
+            isMetric = true
+            binding.measurementToggleGroup.check(R.id.metric_toggle)
+        }
+        updateServingControls()
         currentUserRating = recipe.userRating?.coerceIn(0, 5) ?: 0
         updateRatingSelection(currentUserRating)
 
@@ -260,6 +333,10 @@ class RecipePostDetailFragment : Fragment() {
             findNavController().navigateUp()
         }
 
+        binding.detailStatusBackButton.setOnClickListener {
+            findNavController().navigateUp()
+        }
+
         binding.bookmarkButton.setOnClickListener {
             toggleSavedState()
         }
@@ -269,23 +346,25 @@ class RecipePostDetailFragment : Fragment() {
         }
 
         binding.decreaseServingsButton.setOnClickListener {
-            if (servings > 1) {
-                servings--
-                binding.servingCount.text = servings.toString()
-                currentRecipe?.let { renderIngredients(it.ingredients) }
+            if (currentServings > MIN_SERVINGS) {
+                currentServings--
+                updateServingControls()
+                renderCurrentIngredients()
             }
         }
 
         binding.increaseServingsButton.setOnClickListener {
-            servings++
-            binding.servingCount.text = servings.toString()
-            currentRecipe?.let { renderIngredients(it.ingredients) }
+            if (currentServings < MAX_SERVINGS) {
+                currentServings++
+                updateServingControls()
+                renderCurrentIngredients()
+            }
         }
 
         binding.measurementToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
                 isMetric = checkedId == R.id.metric_toggle
-                currentRecipe?.let { renderIngredients(it.ingredients) }
+                renderCurrentIngredients()
             }
         }
 
@@ -560,7 +639,7 @@ class RecipePostDetailFragment : Fragment() {
     private fun renderIngredients(ingredients: List<RecipeIngredientResponse>) {
         binding.ingredientsList.removeAllViews()
         val inflater = LayoutInflater.from(requireContext())
-        val scalingFactor = servings / 2.0
+        val scalingFactor = currentServings.toDouble() / originalServings.coerceAtLeast(1).toDouble()
 
         ingredients.forEach { ingredient ->
             val itemBinding = ItemRecipePostIngredientBinding.inflate(inflater, binding.ingredientsList, false)
@@ -568,6 +647,25 @@ class RecipePostDetailFragment : Fragment() {
             itemBinding.ingredientQuantityUnit.text = formatIngredientQuantity(ingredient, scalingFactor)
             binding.ingredientsList.addView(itemBinding.root)
         }
+    }
+
+    private fun renderCurrentIngredients() {
+        currentRecipe?.let { recipe -> renderIngredients(recipe.ingredients) }
+    }
+
+    private fun updateServingControls() {
+        currentServings = currentServings.coerceIn(MIN_SERVINGS, MAX_SERVINGS)
+        binding.servingCount.text = currentServings.toString()
+        binding.decreaseServingsButton.isEnabled = currentServings > MIN_SERVINGS
+        binding.increaseServingsButton.isEnabled = currentServings < MAX_SERVINGS
+        binding.decreaseServingsButton.alpha = if (binding.decreaseServingsButton.isEnabled) 1f else DISABLED_CONTROL_ALPHA
+        binding.increaseServingsButton.alpha = if (binding.increaseServingsButton.isEnabled) 1f else DISABLED_CONTROL_ALPHA
+    }
+
+    private fun getOriginalServingCount(recipe: RecipeResponse): Int {
+        return recipe.servings.takeIf { it >= MIN_SERVINGS }
+            ?.coerceAtMost(MAX_SERVINGS)
+            ?: DEFAULT_ORIGINAL_SERVINGS
     }
 
     private fun formatIngredientQuantity(
@@ -580,16 +678,12 @@ class RecipePostDetailFragment : Fragment() {
             return unit
         }
 
-        val scaledQuantity = quantity.toDoubleOrNull()?.let { formatQuantity(it * scalingFactor) } ?: quantity
-        return listOf(scaledQuantity, unit).filter { it.isNotBlank() }.joinToString(" ")
-    }
-
-    private fun formatQuantity(qty: Double): String {
-        return if (qty % 1.0 == 0.0) {
-            qty.toInt().toString()
-        } else {
-            String.format("%.1f", qty)
-        }
+        return IngredientQuantityFormatter.format(
+            quantity = quantity,
+            unit = unit,
+            servingScale = scalingFactor,
+            useMetric = isMetric
+        )
     }
 
     private fun renderDirections(directions: List<String>) {
@@ -639,7 +733,7 @@ class RecipePostDetailFragment : Fragment() {
                 onSuccess = { posts ->
                     val recommendations = posts
                         .filter { post ->
-                            val linkedRecipeId = post.recipeId ?: post.recipe?.id
+                            val linkedRecipeId = post.recipeId
                             linkedRecipeId != null && linkedRecipeId != currentRecipeId
                         }
                         .sortedByDescending { parseInstant(it.createdAt) ?: Instant.EPOCH }
@@ -684,7 +778,7 @@ class RecipePostDetailFragment : Fragment() {
             return
         }
 
-        val recipeId = post.recipeId ?: post.recipe?.id ?: return
+        val recipeId = post.recipeId ?: return
         val navController = findNavController()
         if (navController.currentDestination?.id != R.id.recipePostDetailFragment) {
             return
@@ -773,6 +867,10 @@ class RecipePostDetailFragment : Fragment() {
         private const val LOCAL_USER_ID = "local-user"
         private const val RECIPE_FORM_DIALOG_TAG = "RecipeFormDialog"
         private const val COMMENT_FORM_DIALOG_TAG = "CommentFormDialog"
+        private const val MIN_SERVINGS = 1
+        private const val MAX_SERVINGS = 20
+        private const val DEFAULT_ORIGINAL_SERVINGS = 2
+        private const val DISABLED_CONTROL_ALPHA = 0.45f
     }
 
     private class RecommendationsAdapter(
@@ -799,6 +897,7 @@ class RecipePostDetailFragment : Fragment() {
             holder.binding.recCreator.text = "by ${post.creatorName}"
             holder.binding.recTime.text = recipe?.cookingTimeMinutes?.let { "$it mins" }
                 ?: holder.binding.root.context.getString(R.string.no_cooking_time)
+            holder.binding.recImage.loadRecipeImage(recipe?.imageUrl)
             holder.binding.recommendationCard.setOnClickListener { onClick(post) }
         }
 

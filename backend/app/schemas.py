@@ -1,4 +1,5 @@
 from datetime import datetime
+import re
 
 from pydantic import BaseModel
 from pydantic import ConfigDict
@@ -49,6 +50,8 @@ class RecipeCreate(BaseModel):
     ingredients: list[RecipeIngredientCreate] = Field(min_length=1)
     instructions: list[str] = Field(min_length=1)
     cooking_time_minutes: int | None = Field(default=None, gt=0)
+    servings: int = Field(default=2, ge=1)
+    image_url: str | None = None
 
     @field_validator("title")
     @classmethod
@@ -67,6 +70,21 @@ class RecipeCreate(BaseModel):
             raise ValueError("Instructions must not be blank.")
 
         return cleaned_values
+
+    @field_validator("image_url")
+    @classmethod
+    def image_url_must_be_upload_path(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+
+        cleaned_value = value.strip()
+        if not cleaned_value:
+            return None
+
+        if not re.fullmatch(r"/uploads/recipes/[a-f0-9]{64}\.(jpg|png|webp)", cleaned_value):
+            raise ValueError("Recipe image URL must reference an uploaded recipe image.")
+
+        return cleaned_value
 
 
 class RecipeUpdate(RecipeCreate):
@@ -88,6 +106,8 @@ class RecipeRead(BaseModel):
     ingredients: list[RecipeIngredientRead]
     instructions: list[str]
     cooking_time_minutes: int | None = None
+    servings: int
+    image_url: str | None = None
     average_rating: float | None = None
     rating_count: int = 0
     user_rating: int | None = None
@@ -105,6 +125,12 @@ class RecipeRatingRead(BaseModel):
     average_rating: float | None
     rating_count: int
     user_rating: int | None
+
+
+class RecipeImageUploadRead(BaseModel):
+    image_url: str
+    sha256_hash: str
+    content_type: str
 
 
 class CommunityPostCreate(BaseModel):

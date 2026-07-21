@@ -43,6 +43,7 @@ class SearchRecipeAdapter(
             binding.postTapHint.visibility = android.view.View.VISIBLE
             binding.postActionsRow.visibility = android.view.View.GONE
             binding.postRecipeImage.visibility = android.view.View.VISIBLE
+            binding.postRecipeImage.loadRecipeImage(item.imageUrl)
             binding.communityPostCard.isClickable = true
             binding.communityPostCard.isFocusable = true
             binding.communityPostCard.setOnClickListener {
@@ -59,5 +60,6 @@ data class SearchRecipeCardItem(
     val creatorName: String,
     val cookingTimeText: String,
     val ingredients: List<String>,
+    val imageUrl: String?,
     val sortKey: Long
 )

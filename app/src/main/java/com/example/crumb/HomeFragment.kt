@@ -206,6 +206,7 @@ class HomeFragment : Fragment() {
         binding.featuredRecipeCreatorName.text = findCreatorNameForRecipe(featuredRecipe.id)
         binding.featuredRecipeTitle.text = featuredRecipe.title
         binding.featuredRecipeCookingTime.text = formatCookingTime(featuredRecipe)
+        binding.featuredRecipeImage.loadRecipeImage(featuredRecipe.imageUrl)
 
         binding.recentRecipesContainer.removeAllViews()
         binding.recentRecipesTitle.visibility = View.VISIBLE
@@ -255,6 +256,7 @@ class HomeFragment : Fragment() {
         cardBinding.postTapHint.visibility = View.VISIBLE
         cardBinding.postActionsRow.visibility = View.GONE
         cardBinding.postRecipeImage.visibility = View.VISIBLE
+        cardBinding.postRecipeImage.loadRecipeImage(recipe.imageUrl)
         cardBinding.communityPostCard.setOnClickListener {
             openRecipeDetails(recipe.id, postId)
         }
@@ -264,13 +266,13 @@ class HomeFragment : Fragment() {
 
     private fun findPostIdForRecipe(recipeId: Int): Int? {
         return cachedPosts.firstOrNull {
-            it.recipeId == recipeId || it.recipe?.id == recipeId
+            it.recipeId == recipeId
         }?.id
     }
 
     private fun findCreatorNameForRecipe(recipeId: Int): String {
         return cachedPosts.firstOrNull {
-            it.recipeId == recipeId || it.recipe?.id == recipeId
+            it.recipeId == recipeId
         }?.creatorName ?: getString(R.string.profile_user_name)
     }
 

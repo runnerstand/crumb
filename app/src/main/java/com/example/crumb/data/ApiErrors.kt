@@ -9,7 +9,11 @@ import java.io.EOFException
 import java.io.IOException
 import java.net.SocketTimeoutException
 
-class UserVisibleApiException(message: String, cause: Throwable? = null) : Exception(message, cause)
+class UserVisibleApiException(
+    message: String,
+    cause: Throwable? = null,
+    val statusCode: Int? = null
+) : Exception(message, cause)
 
 suspend fun <T> safeApiCall(block: suspend () -> T): Result<T> {
     return try {
@@ -18,8 +22,12 @@ suspend fun <T> safeApiCall(block: suspend () -> T): Result<T> {
         throw error
     } catch (error: Throwable) {
         Log.w("CrumbApi", "API request failed", error)
-        Result.failure(UserVisibleApiException(error.toUserVisibleMessage(), error))
+        Result.failure(UserVisibleApiException(error.toUserVisibleMessage(), error, error.httpStatusCode()))
     }
+}
+
+private fun Throwable.httpStatusCode(): Int? {
+    return (this as? HttpException)?.code()
 }
 
 private fun Throwable.toUserVisibleMessage(): String {

@@ -229,3 +229,64 @@ def test_legacy_sqlite_saved_recipes_schema_allows_bookmark_insert(
 
     assert response.status_code == 201
     assert response.json()["recipe_id"] == recipe["id"]
+
+
+def test_legacy_sqlite_recipes_schema_gets_default_servings(
+    tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    engine = create_engine(
+        f"sqlite:///{tmp_path / 'legacy_recipes.db'}",
+        connect_args={"check_same_thread": False},
+    )
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                """
+                CREATE TABLE recipes (
+                    id INTEGER NOT NULL PRIMARY KEY,
+                    user_id VARCHAR(255) NOT NULL,
+                    title VARCHAR(255) NOT NULL,
+                    instructions JSON NOT NULL,
+                    cooking_time_minutes INTEGER,
+                    created_at DATETIME NOT NULL
+                )
+                """
+            )
+        )
+        connection.execute(
+            text(
+                """
+                INSERT INTO recipes (
+                    id,
+                    user_id,
+                    title,
+                    instructions,
+                    cooking_time_minutes,
+                    created_at
+                )
+                VALUES (
+                    1,
+                    'local-user',
+                    'Legacy Recipe',
+                    '["Cook it."]',
+                    10,
+                    CURRENT_TIMESTAMP
+                )
+                """
+            )
+        )
+
+    monkeypatch.setattr(database, "engine", engine)
+    database.init_db()
+    database.init_db()
+
+    columns_by_name = {
+        column["name"]: column for column in inspect(engine).get_columns("recipes")
+    }
+    assert columns_by_name["servings"]["nullable"] is False
+    with engine.connect() as connection:
+        legacy_servings = connection.execute(
+            text("SELECT servings FROM recipes WHERE id = 1")
+        ).scalar_one()
+    assert legacy_servings == 2

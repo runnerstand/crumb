@@ -13,6 +13,7 @@ data class RecipeDraftIngredient(
 data class RecipeDraft(
     val title: String,
     val cookingTime: String,
+    val servings: String,
     val instructions: String,
     val ingredients: List<RecipeDraftIngredient>
 )
@@ -75,6 +76,7 @@ class RecipeDraftStore(private val context: Context) {
         return RecipeDraft(
             title = json.optString(KEY_TITLE),
             cookingTime = json.optString(KEY_COOKING_TIME),
+            servings = json.optString(KEY_SERVINGS, DEFAULT_SERVINGS),
             instructions = json.optString(KEY_INSTRUCTIONS),
             ingredients = ingredients
         )
@@ -84,6 +86,7 @@ class RecipeDraftStore(private val context: Context) {
         return JSONObject().apply {
             put(KEY_TITLE, title)
             put(KEY_COOKING_TIME, cookingTime)
+            put(KEY_SERVINGS, servings)
             put(KEY_INSTRUCTIONS, instructions)
             put(KEY_INGREDIENTS, JSONArray().apply {
                 ingredients.forEach { ingredient ->
@@ -102,6 +105,7 @@ class RecipeDraftStore(private val context: Context) {
     private fun RecipeDraft.hasMeaningfulContent(): Boolean {
         return title.isNotBlank() ||
             cookingTime.isNotBlank() ||
+            servings.isNotBlank() && servings != DEFAULT_SERVINGS ||
             instructions.isNotBlank() ||
             ingredients.isNotEmpty()
     }
@@ -115,10 +119,12 @@ class RecipeDraftStore(private val context: Context) {
         private const val KEY_DRAFT_JSON = "draft_json"
         private const val KEY_TITLE = "title"
         private const val KEY_COOKING_TIME = "cooking_time"
+        private const val KEY_SERVINGS = "servings"
         private const val KEY_INSTRUCTIONS = "instructions"
         private const val KEY_INGREDIENTS = "ingredients"
         private const val KEY_NAME = "name"
         private const val KEY_QUANTITY = "quantity"
         private const val KEY_UNIT = "unit"
+        private const val DEFAULT_SERVINGS = "2"
     }
 }

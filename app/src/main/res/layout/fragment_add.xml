@@ -68,6 +68,72 @@
             android:textSize="15sp" />
 
         <EditText
+            android:id="@+id/servings_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginTop="@dimen/spacing_medium"
+            android:background="@drawable/bg_rounded_field"
+            android:hint="@string/servings_hint"
+            android:importantForAutofill="no"
+            android:inputType="number"
+            android:maxLength="2"
+            android:maxLines="1"
+            android:padding="12dp"
+            android:text="2"
+            android:textColor="@color/text_dark_brown"
+            android:textColorHint="@color/text_muted_brown"
+            android:textSize="15sp" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_large"
+            android:text="@string/recipe_image_label"
+            android:textColor="@color/text_dark_brown"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/recipe_image_preview"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:contentDescription="@string/recipe_image"
+            android:scaleType="centerCrop"
+            android:src="@drawable/recipe_placeholder" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_small"
+            android:orientation="horizontal">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/choose_image_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/choose_recipe_image"
+                android:textColor="@color/primary_orange"
+                app:cornerRadius="@dimen/button_radius"
+                app:strokeColor="@color/primary_orange" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/clear_image_button"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/spacing_medium"
+                android:layout_weight="1"
+                android:text="@string/clear_recipe_image"
+                android:textColor="@color/error_red"
+                android:visibility="gone"
+                app:cornerRadius="@dimen/button_radius"
+                tools:visibility="visible" />
+        </LinearLayout>
+
+        <EditText
             android:id="@+id/instructions_edit_text"
             android:layout_width="match_parent"
             android:layout_height="@dimen/instructions_field_height"

@@ -1,4 +1,5 @@
 from datetime import datetime
+from datetime import timedelta
 from datetime import timezone
 
 from fastapi import APIRouter
@@ -51,6 +52,8 @@ def serialize_recipe(recipe: Recipe, db: Session) -> dict:
         ],
         "instructions": recipe.instructions,
         "cooking_time_minutes": recipe.cooking_time_minutes,
+        "servings": recipe.servings,
+        "image_url": recipe.image_url,
         "average_rating": rating_summary.average_rating,
         "rating_count": rating_summary.rating_count,
         "user_rating": rating_summary.user_rating,
@@ -352,7 +355,12 @@ def update_community_comment(
         )
 
     community_comment.comment_text = comment.comment_text
-    community_comment.updated_at = datetime.now(timezone.utc)
+    updated_at = datetime.now(timezone.utc)
+    if community_comment.created_at.tzinfo is None:
+        updated_at = updated_at.replace(tzinfo=None)
+    if updated_at <= community_comment.created_at:
+        updated_at = community_comment.created_at + timedelta(microseconds=1)
+    community_comment.updated_at = updated_at
 
     if comment.rating is not None:
         linked_recipe_id = get_linked_recipe_id(community_comment.post)

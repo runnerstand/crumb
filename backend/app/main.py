@@ -1,7 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.database import init_db
+from app.recipe_images import UPLOAD_ROOT
+from app.recipe_images import UPLOAD_ROUTE
+from app.recipe_images import ensure_recipe_upload_dir
 from app.routers import community
 from app.routers import ingredients
 from app.routers import recipes
@@ -65,6 +69,13 @@ app.add_middleware(
 )
 
 init_db()
+ensure_recipe_upload_dir()
+
+app.mount(
+    UPLOAD_ROUTE,
+    StaticFiles(directory=UPLOAD_ROOT),
+    name="recipe_uploads",
+)
 
 app.include_router(ingredients.router)
 app.include_router(recipes.router)

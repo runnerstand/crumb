@@ -112,6 +112,8 @@
     <string name="recipe_title_required">Please enter a recipe title.</string>
     <string name="recipe_title_too_long">Recipe title must be 120 characters or fewer.</string>
     <string name="recipe_cooking_time_invalid">Cooking time must be greater than zero.</string>
+    <string name="servings_hint">Servings</string>
+    <string name="recipe_servings_invalid">Servings must be between 1 and 20.</string>
     <string name="recipe_ingredients_required">Add at least one ingredient.</string>
     <string name="recipe_quantity_required">Enter a quantity for each ingredient.</string>
     <string name="recipe_quantity_invalid">Quantity must be a number greater than zero.</string>
@@ -119,6 +121,9 @@
     <string name="recipe_instructions_required">Please enter recipe instructions.</string>
     <string name="recipe_instructions_too_long">Instructions are too long.</string>
     <string name="generic_error">Something went wrong. Please try again.</string>
+    <string name="go_back">Back</string>
+    <string name="recipe_not_found">Recipe not found.</string>
+    <string name="recipe_details_loading">Loading recipe...</string>
     <string name="recipe_details_title">Recipe Details</string>
     <string name="home_welcome_title">Hello, Foodie!</string>
     <string name="home_welcome_subtitle">What are we cooking today?</string>
@@ -166,4 +171,8 @@
     <string name="recipe_preference_warning_message">These selected ingredients conflict with your saved profile preferences:\n\n%1$s</string>
     <string name="recipe_preference_warning_go_back">Go Back</string>
     <string name="recipe_preference_warning_save_anyway">Save Anyway</string>
+    <string name="recipe_image_label">Recipe Image</string>
+    <string name="choose_recipe_image">Choose Image</string>
+    <string name="replace_recipe_image">Replace Image</string>
+    <string name="clear_recipe_image">Clear Image</string>
 </resources>

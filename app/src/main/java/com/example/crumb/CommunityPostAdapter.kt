@@ -45,7 +45,7 @@ class CommunityPostAdapter(
         private val onLegacyDeleteClick: (CommunityPostResponse) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(post: CommunityPostResponse) {
-            val linkedRecipeId = post.recipeId ?: post.recipe?.id
+            val linkedRecipeId = post.recipeId
             val isLinkedRecipePost = linkedRecipeId != null
 
             binding.postCreatorName.text = post.creatorName
@@ -72,10 +72,11 @@ class CommunityPostAdapter(
                 View.VISIBLE
             }
             binding.postRecipeImage.visibility = if (isLinkedRecipePost) View.VISIBLE else View.GONE
+            binding.postRecipeImage.loadRecipeImage(post.recipe?.imageUrl)
             binding.postRating.visibility = if (isLinkedRecipePost) View.VISIBLE else View.GONE
             binding.postTapHint.visibility = if (isLinkedRecipePost) View.VISIBLE else View.GONE
             binding.postActionsRow.visibility = if (isLinkedRecipePost) View.GONE else View.VISIBLE
-            binding.editPostButton.visibility = if (post.recipe == null) View.VISIBLE else View.GONE
+            binding.editPostButton.visibility = if (!isLinkedRecipePost) View.VISIBLE else View.GONE
             binding.communityPostCard.isClickable = isLinkedRecipePost
             binding.communityPostCard.isFocusable = isLinkedRecipePost
             binding.communityPostCard.setOnClickListener(

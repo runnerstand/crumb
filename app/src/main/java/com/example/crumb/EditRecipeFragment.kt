@@ -1,6 +1,7 @@
 package com.example.crumb
 
 import android.app.AlertDialog
+import android.net.Uri
 import android.os.Bundle
 import android.text.InputFilter
 import android.view.LayoutInflater
@@ -8,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.addCallback
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.os.bundleOf
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -44,6 +47,17 @@ class EditRecipeFragment : Fragment() {
     private var originalRequest: RecipeRequest? = null
     private var isPopulating = false
     private var isPreferenceWarningShowing = false
+    private var currentImageUrl: String? = null
+    private var selectedImageUri: Uri? = null
+    private var isImageCleared = false
+    private val imagePicker = registerForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null && _binding != null) {
+            selectedImageUri = uri
+            isImageCleared = false
+            updateImagePreview()
+            onFormChanged()
+        }
+    }
 
     private val recipeId: Int
         get() = arguments?.getInt(ARG_RECIPE_ID, NO_RECIPE_ID) ?: NO_RECIPE_ID
@@ -72,11 +86,19 @@ class EditRecipeFragment : Fragment() {
         binding.selectedIngredientRecyclerView.adapter = selectedIngredientAdapter
         binding.recipeTitleEditText.doAfterTextChanged { onFormChanged() }
         binding.cookingTimeEditText.doAfterTextChanged { onFormChanged() }
+        binding.servingsEditText.doAfterTextChanged { onFormChanged() }
         binding.instructionsEditText.doAfterTextChanged { onFormChanged() }
         binding.ingredientSearchEditText.doAfterTextChanged { updateIngredientList() }
         binding.ingredientRetryButton.setOnClickListener { loadIngredients() }
         binding.cancelButton.setOnClickListener { confirmExitIfChanged() }
         binding.saveButton.setOnClickListener { saveChanges() }
+        binding.chooseImageButton.setOnClickListener { openImagePicker() }
+        binding.clearImageButton.setOnClickListener {
+            selectedImageUri = null
+            isImageCleared = true
+            updateImagePreview()
+            onFormChanged()
+        }
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             confirmExitIfChanged()
         }
@@ -147,6 +169,7 @@ class EditRecipeFragment : Fragment() {
         try {
             binding.recipeTitleEditText.setText(recipe.title)
             binding.cookingTimeEditText.setText(recipe.cookingTimeMinutes?.toString().orEmpty())
+            binding.servingsEditText.setText(recipe.servings.coerceIn(MIN_SERVINGS, MAX_SERVINGS).toString())
             binding.instructionsEditText.setText(recipe.instructions.joinToString("\n"))
             binding.ingredientSearchEditText.text = null
             selectedIngredients.clear()
@@ -158,6 +181,10 @@ class EditRecipeFragment : Fragment() {
                 )
                 selectedIngredients[selected.name.lowercase(Locale.US)] = selected
             }
+            currentImageUrl = recipe.imageUrl
+            selectedImageUri = null
+            isImageCleared = false
+            updateImagePreview()
             updateSelectedIngredients()
             originalRequest = buildRecipeRequest(showErrors = false)
             binding.formErrorText.visibility = View.GONE
@@ -234,12 +261,18 @@ class EditRecipeFragment : Fragment() {
 
         setSavingState(true)
         saveRecipeJob = viewLifecycleOwner.lifecycleScope.launch {
-            val result = recipeRepository.updateUserRecipe(recipeId, request)
+            val imageUploadResult = uploadSelectedImageUrl()
+            if (imageUploadResult.isFailure) return@launch
+            val finalRequest = request.copy(imageUrl = imageUploadResult.getOrNull())
+            val result = recipeRepository.updateUserRecipe(recipeId, finalRequest)
             if (_binding == null) return@launch
 
             result.fold(
                 onSuccess = {
-                    originalRequest = request
+                    currentImageUrl = finalRequest.imageUrl
+                    selectedImageUri = null
+                    isImageCleared = false
+                    originalRequest = finalRequest
                     setFragmentResult(
                         RecipeFormDialogFragment.REQUEST_KEY,
                         bundleOf(RecipeFormDialogFragment.RESULT_CHANGED to true)
@@ -252,6 +285,54 @@ class EditRecipeFragment : Fragment() {
                     setSavingState(false)
                 }
             )
+        }
+    }
+
+    private suspend fun uploadSelectedImageUrl(): Result<String?> {
+        val imageUri = selectedImageUri
+        if (imageUri == null) {
+            return Result.success(if (isImageCleared) null else currentImageUrl)
+        }
+
+        val result = recipeRepository.uploadRecipeImage(requireContext(), imageUri)
+        if (_binding == null) return Result.failure(IllegalStateException("View is no longer available."))
+
+        return result.fold(
+            onSuccess = { upload -> Result.success(upload.imageUrl) },
+            onFailure = { error ->
+                showFormError(error.message ?: getString(R.string.generic_error))
+                setSavingState(false)
+                Result.failure(error)
+            }
+        )
+    }
+
+    private fun openImagePicker() {
+        if (!binding.chooseImageButton.isEnabled) {
+            return
+        }
+
+        imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    }
+
+    private fun updateImagePreview() {
+        val imageUri = selectedImageUri
+        when {
+            imageUri != null -> {
+                binding.recipeImagePreview.setImageURI(imageUri)
+                binding.chooseImageButton.text = getString(R.string.replace_recipe_image)
+                binding.clearImageButton.visibility = View.VISIBLE
+            }
+            !isImageCleared && !currentImageUrl.isNullOrBlank() -> {
+                binding.recipeImagePreview.loadRecipeImage(currentImageUrl)
+                binding.chooseImageButton.text = getString(R.string.replace_recipe_image)
+                binding.clearImageButton.visibility = View.VISIBLE
+            }
+            else -> {
+                binding.recipeImagePreview.setImageResource(R.drawable.recipe_placeholder)
+                binding.chooseImageButton.text = getString(R.string.choose_recipe_image)
+                binding.clearImageButton.visibility = View.GONE
+            }
         }
     }
 
@@ -290,6 +371,8 @@ class EditRecipeFragment : Fragment() {
             .orEmpty()
         val cookingTime = binding.cookingTimeEditText.text?.toString()?.trim().orEmpty()
         val parsedCookingTime = cookingTime.takeIf { it.isNotBlank() }?.toIntOrNull()
+        val servingsText = binding.servingsEditText.text?.toString()?.trim().orEmpty()
+        val parsedServings = servingsText.toIntOrNull()
         val ingredients = selectedIngredients.values.map {
             RecipeIngredientRequest(
                 ingredientName = it.name,
@@ -310,6 +393,9 @@ class EditRecipeFragment : Fragment() {
         if (cookingTime.isNotBlank() && (parsedCookingTime == null || parsedCookingTime <= 0)) {
             return fail(R.string.recipe_cooking_time_invalid)
         }
+        if (parsedServings == null || parsedServings !in MIN_SERVINGS..MAX_SERVINGS) {
+            return fail(R.string.recipe_servings_invalid)
+        }
         if (instructions.isEmpty()) return fail(R.string.recipe_instructions_required)
         if (instructions.any { it.length > MAX_INSTRUCTION_LINE_LENGTH }) {
             return fail(R.string.recipe_instructions_too_long)
@@ -327,11 +413,17 @@ class EditRecipeFragment : Fragment() {
             title = title,
             ingredients = ingredients,
             instructions = instructions,
-            cookingTimeMinutes = parsedCookingTime
+            cookingTimeMinutes = parsedCookingTime,
+            servings = parsedServings,
+            imageUrl = if (isImageCleared) null else currentImageUrl
         )
     }
 
     private fun hasMeaningfulChanges(): Boolean {
+        if (selectedImageUri != null || isImageCleared) {
+            return true
+        }
+
         val original = originalRequest ?: return false
         val current = buildRecipeRequest(showErrors = false) ?: return true
         return current != original
@@ -361,6 +453,8 @@ class EditRecipeFragment : Fragment() {
     private fun setSavingState(isSaving: Boolean) {
         binding.saveButton.isEnabled = !isSaving
         binding.cancelButton.isEnabled = !isSaving
+        binding.chooseImageButton.isEnabled = !isSaving
+        binding.clearImageButton.isEnabled = !isSaving
     }
 
     override fun onDestroyView() {
@@ -379,6 +473,8 @@ class EditRecipeFragment : Fragment() {
         private const val MAX_TITLE_LENGTH = 120
         private const val MAX_INSTRUCTIONS_LENGTH = 4000
         private const val MAX_INSTRUCTION_LINE_LENGTH = 1000
+        private const val MIN_SERVINGS = 1
+        private const val MAX_SERVINGS = 20
     }
 }
 

@@ -8,7 +8,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:8000/"
+    const val BASE_URL = "http://10.0.2.2:8000/"
     private const val TIMEOUT_SECONDS = 15L
 
     private val moshi = Moshi.Builder()
@@ -29,5 +29,12 @@ object RetrofitClient {
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()
             .create(ApiService::class.java)
+    }
+
+    fun absoluteUrl(pathOrUrl: String?): String? {
+        val value = pathOrUrl?.trim().orEmpty()
+        if (value.isBlank()) return null
+        if (value.startsWith("http://") || value.startsWith("https://")) return value
+        return BASE_URL.trimEnd('/') + "/" + value.trimStart('/')
     }
 }

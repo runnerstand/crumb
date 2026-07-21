@@ -14,7 +14,10 @@ data class RecipeRequest(
     val ingredients: List<RecipeIngredientRequest>,
     val instructions: List<String>,
     @param:Json(name = "cooking_time_minutes")
-    val cookingTimeMinutes: Int? = null
+    val cookingTimeMinutes: Int? = null,
+    val servings: Int = 2,
+    @param:Json(name = "image_url")
+    val imageUrl: String? = null
 )
 
 data class RecipeIngredientResponse(
@@ -37,6 +40,9 @@ data class RecipeResponse(
     val instructions: List<String>,
     @param:Json(name = "cooking_time_minutes")
     val cookingTimeMinutes: Int? = null,
+    val servings: Int = 2,
+    @param:Json(name = "image_url")
+    val imageUrl: String? = null,
     @param:Json(name = "average_rating")
     val averageRating: Double? = null,
     @param:Json(name = "rating_count")
@@ -45,4 +51,13 @@ data class RecipeResponse(
     val userRating: Int? = null,
     @param:Json(name = "created_at")
     val createdAt: String
+)
+
+data class RecipeImageUploadResponse(
+    @param:Json(name = "image_url")
+    val imageUrl: String,
+    @param:Json(name = "sha256_hash")
+    val sha256Hash: String,
+    @param:Json(name = "content_type")
+    val contentType: String
 )

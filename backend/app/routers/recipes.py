@@ -8,7 +8,9 @@ from urllib import request as urllib_request
 
 from fastapi import APIRouter
 from fastapi import Depends
+from fastapi import File
 from fastapi import HTTPException
+from fastapi import UploadFile
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic import field_validator
@@ -33,8 +35,10 @@ from app.models import SavedRecipe
 from app.models import User
 from app.rating_utils import get_recipe_rating_summary
 from app.rating_utils import upsert_recipe_rating
+from app.recipe_images import store_recipe_image
 from app.recipe_retrieval import SemanticRecipeRetriever
 from app.schemas import RecipeCreate
+from app.schemas import RecipeImageUploadRead
 from app.schemas import RecipeRatingRead
 from app.schemas import RecipeRatingUpsert
 from app.schemas import RecipeRead
@@ -97,6 +101,8 @@ def serialize_recipe(recipe: Recipe, db: Session) -> dict[str, Any]:
         ],
         "instructions": recipe.instructions,
         "cooking_time_minutes": recipe.cooking_time_minutes,
+        "servings": recipe.servings,
+        "image_url": recipe.image_url,
         "average_rating": rating_summary.average_rating,
         "rating_count": rating_summary.rating_count,
         "user_rating": rating_summary.user_rating,
@@ -186,6 +192,8 @@ def create_user_recipe(
         title=recipe_request.title,
         instructions=recipe_request.instructions,
         cooking_time_minutes=recipe_request.cooking_time_minutes,
+        servings=recipe_request.servings,
+        image_url=recipe_request.image_url,
     )
     replace_recipe_ingredients(recipe, recipe_request, db)
 
@@ -236,6 +244,8 @@ def update_user_recipe(
     recipe.title = recipe_request.title
     recipe.instructions = recipe_request.instructions
     recipe.cooking_time_minutes = recipe_request.cooking_time_minutes
+    recipe.servings = recipe_request.servings
+    recipe.image_url = recipe_request.image_url
     replace_recipe_ingredients(recipe, recipe_request, db)
 
     db.commit()
@@ -270,6 +280,18 @@ def read_recipe(
 ) -> dict[str, Any]:
     recipe = get_recipe_or_404(recipe_id, db)
     return serialize_recipe(recipe, db)
+
+
+@router.post("/recipes/images", response_model=RecipeImageUploadRead, status_code=201)
+async def upload_recipe_image(
+    image: UploadFile = File(...),
+) -> RecipeImageUploadRead:
+    stored_image = await store_recipe_image(image)
+    return RecipeImageUploadRead(
+        image_url=stored_image.image_url,
+        sha256_hash=stored_image.sha256_hash,
+        content_type=stored_image.content_type,
+    )
 
 
 @router.get("/recipes/{recipe_id}/rating", response_model=RecipeRatingRead)

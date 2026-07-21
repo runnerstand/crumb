@@ -77,8 +77,39 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <LinearLayout
+            android:id="@+id/detail_status_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/detail_status_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/text_dark_brown"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="@string/recipe_not_found" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/detail_status_back_button"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_medium"
+                android:text="@string/go_back"
+                android:textColor="@color/primary_orange"
+                app:cornerRadius="@dimen/button_radius"
+                app:strokeColor="@color/primary_orange" />
+        </LinearLayout>
+
         <!-- 2. CONTENT CONTAINER -->
         <LinearLayout
+            android:id="@+id/recipe_content_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"

@@ -46,6 +46,8 @@ class Recipe(Base):
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     instructions: Mapped[list[str]] = mapped_column(JSON, default=list, nullable=False)
     cooking_time_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    servings: Mapped[int] = mapped_column(Integer, nullable=False, default=2)
+    image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

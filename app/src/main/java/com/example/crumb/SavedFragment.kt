@@ -199,8 +199,7 @@ class SavedFragment : Fragment() {
 
     private fun List<CommunityPostResponse>.postIdsByRecipeId(): Map<Int, Int> {
         return mapNotNull { post ->
-            val recipeId = post.recipeId ?: post.recipe?.id
-            recipeId?.let { it to post.id }
+            post.recipeId?.let { recipeId -> recipeId to post.id }
         }.toMap()
     }
 

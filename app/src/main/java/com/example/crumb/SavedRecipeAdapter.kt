@@ -69,6 +69,7 @@ class SavedRecipeAdapter(
             binding.savedRecipeTitle.text = recipe.title
             binding.savedRecipeCookingTime.text = recipe.cookingTimeMinutes?.let { "$it minutes" }
                 ?: binding.root.context.getString(R.string.no_cooking_time)
+            binding.savedRecipeImage.loadRecipeImage(recipe.imageUrl)
             binding.savedRecipeTapHint.text = binding.root.context.getString(R.string.tap_for_recipe_details)
             binding.savedRecipeCard.isClickable = true
             binding.savedRecipeCard.isFocusable = true

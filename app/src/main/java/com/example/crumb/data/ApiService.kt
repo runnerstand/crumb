@@ -3,8 +3,11 @@ package com.example.crumb.data
 import retrofit2.http.GET
 import retrofit2.http.Body
 import retrofit2.http.DELETE
+import okhttp3.MultipartBody
 import retrofit2.http.PATCH
+import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 
 interface ApiService {
@@ -59,6 +62,10 @@ interface ApiService {
 
     @POST("recipes/user-created")
     suspend fun createUserRecipe(@Body request: RecipeRequest): RecipeResponse
+
+    @Multipart
+    @POST("recipes/images")
+    suspend fun uploadRecipeImage(@Part image: MultipartBody.Part): RecipeImageUploadResponse
 
     @GET("recipes/user-created/{recipe_id}")
     suspend fun getUserRecipe(@Path("recipe_id") recipeId: Int): RecipeResponse

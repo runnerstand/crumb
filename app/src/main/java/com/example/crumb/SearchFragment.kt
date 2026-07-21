@@ -186,6 +186,7 @@ class SearchFragment : Fragment() {
             cookingTimeText = cookingTimeMinutes?.let { "$it minutes" }
                 ?: getString(R.string.no_cooking_time),
             ingredients = ingredients.map { it.ingredientName },
+            imageUrl = imageUrl,
             sortKey = parseInstant(createdAt)?.toEpochMilli() ?: 0L
         )
     }

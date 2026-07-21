@@ -96,7 +96,65 @@ def test_create_user_recipe_uses_local_owner_and_catalogue_ingredients(
     ]
     assert body["instructions"] == ["Cook eggs.", "Serve with tomato and rice."]
     assert body["cooking_time_minutes"] == 20
+    assert body["servings"] == 2
+    assert body["image_url"] is None
     assert "created_at" in body
+
+
+def test_create_user_recipe_accepts_servings(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["servings"] = 4
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 201
+    assert response.json()["servings"] == 4
+
+
+def test_upload_recipe_image_hashes_and_reuses_file(client: TestClient, tmp_path, monkeypatch) -> None:
+    from app import recipe_images
+
+    upload_root = tmp_path / "uploads" / "recipes"
+    monkeypatch.setattr(recipe_images, "UPLOAD_ROOT", upload_root)
+    png_bytes = (
+        b"\x89PNG\r\n\x1a\n"
+        b"\x00\x00\x00\rIHDR"
+        b"\x00\x00\x00\x01\x00\x00\x00\x01\x08\x02\x00\x00\x00"
+        b"\x90wS\xde"
+    )
+
+    first_response = client.post(
+        "/recipes/images",
+        files={"image": ("food.txt", png_bytes, "application/octet-stream")},
+    )
+    second_response = client.post(
+        "/recipes/images",
+        files={"image": ("food.png", png_bytes, "image/png")},
+    )
+
+    assert first_response.status_code == 201
+    assert second_response.status_code == 201
+    first_body = first_response.json()
+    second_body = second_response.json()
+    assert first_body == second_body
+    assert first_body["content_type"] == "image/png"
+    assert first_body["image_url"].startswith("/uploads/recipes/")
+    assert first_body["image_url"].endswith(".png")
+    assert len(list(upload_root.iterdir())) == 1
+
+
+def test_upload_recipe_image_rejects_unsupported_content(client: TestClient, tmp_path, monkeypatch) -> None:
+    from app import recipe_images
+
+    monkeypatch.setattr(recipe_images, "UPLOAD_ROOT", tmp_path / "uploads" / "recipes")
+
+    response = client.post(
+        "/recipes/images",
+        files={"image": ("food.jpg", b"not actually an image", "image/jpeg")},
+    )
+
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Only JPEG, PNG, and WebP images are supported."}
 
 
 def test_list_user_recipes_returns_newest_first(client: TestClient) -> None:
@@ -136,6 +194,7 @@ def test_update_user_recipe_replaces_ingredients(client: TestClient) -> None:
         ],
         "instructions": ["Stir fry spinach with garlic."],
         "cooking_time_minutes": 10,
+        "servings": 3,
     }
 
     response = client.patch(f"/recipes/user-created/{recipe['id']}", json=payload)
@@ -149,6 +208,16 @@ def test_update_user_recipe_replaces_ingredients(client: TestClient) -> None:
     ]
     assert body["instructions"] == ["Stir fry spinach with garlic."]
     assert body["cooking_time_minutes"] == 10
+    assert body["servings"] == 3
+
+
+def test_create_user_recipe_rejects_invalid_servings(client: TestClient) -> None:
+    payload = recipe_payload()
+    payload["servings"] = 0
+
+    response = client.post("/recipes/user-created", json=payload)
+
+    assert response.status_code == 422
 
 
 def test_delete_user_recipe(client: TestClient) -> None:
